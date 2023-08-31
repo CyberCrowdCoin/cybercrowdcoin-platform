@@ -1,9 +1,8 @@
 
 const DemandStatusEnum = {
-    // open/completed/cancel
+    // open/completed
     OPEN : 'open',
-    COMPLETED : 'completed',
-    CANCEL : 'cancel' 
+    COMPLETED : 'completed'
 }
 
 function getDemandStatusEnumValue (name){

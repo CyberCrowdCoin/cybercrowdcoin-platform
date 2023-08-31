@@ -1,11 +1,12 @@
 const Sequelize = require('sequelize')
 const xss = require('xss')
 const Demand = require('../db/mysql/model/Demand')
-const {addToIpfs} = require('../db/ipfs/ipfs')
+const { addToIpfs } = require('../db/ipfs/ipfs')
 const { DemandStatusEnum } = require('../model/enum')
+const protocol = require('./protocol')
 
 
-async function getList(creator = '', title = '', status = '' , contract = '') {
+async function getList(creator = '', title = '', status = '', contract = '') {
     // 拼接查询条件
     const whereOpt = {}
     if (creator) whereOpt.creator = creator
@@ -64,11 +65,13 @@ async function newDemand(demandData = {}) {
     const id = res.dataValues.id
 
     // 存储IPFS
-    let meta = { id:id, title: title, creator: creator, category: category, description: description, status: status,
-        phone: phone, requiredSkill: requiredSkill, tokenAmount : tokenAmount}
+    let meta = {
+        id: id, title: title, creator: creator, category: category, description: description, status: status,
+        phone: phone, requiredSkill: requiredSkill, tokenAmount: tokenAmount
+    }
     let entity = JSON.stringify(meta)
     const ipfsurl = await addToIpfs(entity);
-    // 上链
+    // 上链 todo
 
     // 更新demand表contract字段
     contract = 'test contract'
@@ -76,6 +79,28 @@ async function newDemand(demandData = {}) {
     return {
         id: id
     }
+}
+
+async function endDemand(id, creator = '') {
+    const demandData = await getDetail(id)
+    if (demandData == null || creator != demandData.creator || DemandStatusEnum.OPEN != demandData.status) {
+        return false
+    }
+    // check demand下 无进行中的protocol
+    const protocolList = await protocol.getList(id, null)
+    if (protocolList) {
+        for (const protocol of protocolList) {
+            if (protocol.status == ProtocolStatusEnum.ACTIVE ||
+                protocol.status == ProtocolStatusEnum.INVITE_PENDING ||
+                protocol.status == ProtocolStatusEnum.PROPOSAL_PENDING)
+                return false;
+        }
+    }
+    // 调用合约end demand 退还押金 todo
+
+    // 更新demand status
+    await updateDemandStatus(id, creator, DemandStatusEnum.COMPLETED)
+    return true
 }
 
 async function updateDemandContract(id, contract = '') {
@@ -96,7 +121,7 @@ async function updateDemandContract(id, contract = '') {
     return false
 }
 
-async function updateDemandStatus(id, creator = '',  status = '') {
+async function updateDemandStatus(id, creator = '', status = '') {
     const res = await Demand.update(
         // 要更新的内容
         {
@@ -120,6 +145,7 @@ module.exports = {
     getList,
     getDetail,
     newDemand,
+    endDemand,
     updateDemandContract,
     updateDemandStatus,
 }

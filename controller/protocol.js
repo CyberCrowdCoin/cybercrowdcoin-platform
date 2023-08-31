@@ -2,7 +2,7 @@ const Sequelize = require('sequelize')
 const xss = require('xss')
 const Protocol = require('../db/mysql/model/Protocol')
 const {addToIpfs} = require('../db/ipfs/ipfs')
-const { ProtocolStatusEnum, ProtocolMessageTypeEnum } = require('../model/enum')
+const { ProtocolStatusEnum, ProtocolMessageTypeEnum, DemandStatusEnum } = require('../model/enum')
 const candidate = require('./candidate')
 const demand = require('./demand')
 const proposalMessage = require('./protocol-message')
@@ -36,7 +36,6 @@ async function getDetail(id) {
 // 登录账号为employer才能操作
 async function sendInvitation(protocolData = {}) {
     const demandId = protocolData.demandId
-    const employer = protocolData.employer
     const candidateId = protocolData.candidateId
     const demandData = await demand.getDetail(demandId)
     const candidateData = await candidate.getDetail(candidateId)
@@ -45,6 +44,7 @@ async function sendInvitation(protocolData = {}) {
     if(!checkResult){
         return null
     }
+    const employer = demandData.creator
     // 上传IPFS
     const ipfsurl = await addProtocolToIpfs(demandData.contract, employer, candidateData.user);
     // 上链 todo
@@ -82,6 +82,9 @@ async function newProtocolCheck(demandData, candidateData){
     if(demandData == null || candidateData == null) {
         return false
     }
+    if(demandData.status != DemandStatusEnum.OPEN){
+        return false
+    }
     // 当前demand下没有有效的protocol数据
     const protocols = await getList(demandData.id, null)
     if(protocols){
@@ -89,10 +92,7 @@ async function newProtocolCheck(demandData, candidateData){
             if(protocol.status == ProtocolStatusEnum.ACTIVE || 
                 protocol.status == ProtocolStatusEnum.FINISHED ||
                 protocol.status == ProtocolStatusEnum.INVITE_PENDING || 
-                protocol.status == ProtocolStatusEnum.PROPOSAL_PENDING ||
-                protocol.status == ProtocolStatusEnum.INVITE_CANCEL ||
-                protocol.status == ProtocolStatusEnum.INVITE_REFUSED ||
-                protocol.status == ProtocolStatusEnum.PROPOSAL_REFUSED){
+                protocol.status == ProtocolStatusEnum.PROPOSAL_PENDING ){
                     return false;
                 }
         }

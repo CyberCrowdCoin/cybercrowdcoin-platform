@@ -3,6 +3,7 @@ const {
     getList,
     getDetail,
     newDemand,
+    endDemand,
     updateDemandStatus
 } = require('../controller/demand')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
@@ -50,20 +51,11 @@ router.post('/new', tokenCheck, async function (ctx, next) {
 })
 
 router.post('/end', tokenCheck, async function (ctx, next) {
-    const val = await updateDemandStatus(ctx.query.id, creator, DemandStatusEnum.COMPLETED)
+    const val = await endDemand(ctx.query.id, creator)
     if (val) {
         ctx.body = new SuccessModel()
     } else {
         ctx.body = new ErrorModel('end demand failed')
-    }
-})
-
-router.post('/cancel', tokenCheck, async function (ctx, next) {
-    const val = await updateDemandStatus(ctx.query.id, creator, DemandStatusEnum.CANCEL)
-    if (val) {
-        ctx.body = new SuccessModel()
-    } else {
-        ctx.body = new ErrorModel('cancel demand failed')
     }
 })
 
