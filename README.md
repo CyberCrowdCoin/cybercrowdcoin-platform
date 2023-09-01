@@ -1,15 +1,19 @@
 # blog koa2 sequelize
 
-- 拷贝 blog-koa2/package.json 删掉 `mysql` ，然后 `npm i`
-- 再安装 `npm i mysql2 sequelize --save`
-- 再把 blog-koa2 其他文件/文件夹拷贝过来，除了 `db` 和 `controller`
+## ipfs
+-- 启动
+Ipfs daemon
+-- 本地页面
+http://127.0.0.1:5001/webui
+-- 安装IPFS http
+npm install axios ipfs-http-client
 
+## 安装ethers
+npm install ethers
 
-- 新建 `db/seq.js` ，利用 `conf/db.js` 和 `process.env.NODE_ENV`
-- 新建 `db/model/User.js` 和 `db/model/Blog.js`
-- 新建 `db/sync.js`
+## 安装nginx
+brew install nginx
+npm install mysql2 sequelize
 
-
-- 新建 `controller/user.js`
-- 新建 `controller/blog.js`
-- 联调、测试
+## 项目开发环境启动
+npm rum dev
