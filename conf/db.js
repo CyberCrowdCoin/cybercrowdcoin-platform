@@ -4,7 +4,7 @@ const env = process.env.NODE_ENV  // 环境参数
 let MYSQL_CONF
 let IPFS_CONF
 
-if (env === 'dev') {
+// if (env === 'dev') {
     // mysql
     MYSQL_CONF = {
         host: 'localhost',
@@ -20,7 +20,7 @@ if (env === 'dev') {
         port: 5001,
         protocol: 'http'
     }
-}
+// }
 
 if (env === 'production') {
     // mysql

@@ -18,18 +18,6 @@ const Protocol = seq.define(
             allowNUll: false
         },
 
-        proposalMessageId: {
-            type: Sequelize.BIGINT,
-            allowNUll: false,
-            field: 'proposal_message_id',
-        },
-
-        invitationMessageId: {
-            type: Sequelize.BIGINT,
-            allowNUll: false,
-            field: 'invitation_message_id',
-        },
-
         employer: {
             type: Sequelize.STRING,
             allowNUll: false,

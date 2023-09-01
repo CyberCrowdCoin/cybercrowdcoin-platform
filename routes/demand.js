@@ -4,7 +4,6 @@ const {
     getDetail,
     newDemand,
     endDemand,
-    updateDemandStatus
 } = require('../controller/demand')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 const { DemandStatusEnum } = require('../model/enum')
@@ -51,7 +50,9 @@ router.post('/new', tokenCheck, async function (ctx, next) {
 })
 
 router.post('/end', tokenCheck, async function (ctx, next) {
-    const val = await endDemand(ctx.query.id, creator)
+    const creator = ctx.session.username
+    const id = ctx.request.body.id
+    const val = await endDemand(id, creator)
     if (val) {
         ctx.body = new SuccessModel()
     } else {

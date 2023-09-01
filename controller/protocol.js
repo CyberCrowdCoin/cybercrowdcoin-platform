@@ -6,6 +6,7 @@ const { ProtocolStatusEnum, ProtocolMessageTypeEnum, DemandStatusEnum } = requir
 const candidate = require('./candidate')
 const demand = require('./demand')
 const proposalMessage = require('./protocol-message')
+const Demand = require('../db/mysql/model/Demand')
 
 async function getList(demandId, candidateId) {
     // 拼接查询条件
@@ -44,9 +45,10 @@ async function sendInvitation(protocolData = {}) {
     if(!checkResult){
         return null
     }
-    const employer = demandData.creator
+    const employer = protocolData.employer
     // 上传IPFS
     const ipfsurl = await addProtocolToIpfs(demandData.contract, employer, candidateData.user);
+    console.info('sendInvitation ipfsurl---->', ipfsurl)
     // 上链 todo
     
     // 入protocol表
@@ -58,10 +60,11 @@ async function sendInvitation(protocolData = {}) {
     }
 }
 
+// 登录账号为candidate操作
 // 创建demand protocol表数据 -> 增加一个proposal类型消息并更新demand protocl 表 proposal-message-id
 async function sendProposal(protocolData = {}) {
     const demandId = protocolData.demandId
-    const employer = protocolData.employer
+    
     const candidateAddress = protocolData.candidate
     const demandData = await demand.getDetail(demandId)
     const candidateData = await candidate.getDetailByUser(candidateAddress)
@@ -69,6 +72,7 @@ async function sendProposal(protocolData = {}) {
     if(!checkResult){
         return null
     }
+    const employer = demandData.creator
     // 入protocol表
     const id = await newProtocol(demandId, ProtocolStatusEnum.PROPOSAL_PENDING, employer, candidateData.id)
     // 增加一个proposal类型消息
@@ -108,54 +112,16 @@ async function addProtocolToIpfs(contract, employer, candidate){
 }
 
 async function newProtocol(demandId, status, employer, candidateId){
-    let proposalMessageId = null;
-    let invitationMessageId = null
     const activeDate = null
     // 入protocol表
-    const res = await Demand.create({
+    const res = await Protocol.create({
         demandId,
         status,
-        proposalMessageId,
-        invitationMessageId,
         employer,
         candidateId,
         activeDate,
     })
     return res.dataValues.id
-}
-
-async function updateProposalMessageId(id, proposalMessageId) {
-    const res = await Protocol.update(
-        // 要更新的内容
-        {
-            proposalMessageId,
-        },
-        // 条件
-        {
-            where: {
-                id,
-            }
-        }
-    )
-    if (res[0] >= 1) return true
-    return false
-}
-
-async function updateInvitationMessageId(id, invitationMessageId) {
-    const res = await Protocol.update(
-        // 要更新的内容
-        {
-            invitationMessageId,
-        },
-        // 条件
-        {
-            where: {
-                id,
-            }
-        }
-    )
-    if (res[0] >= 1) return true
-    return false
 }
 
 // 登录账户为candidate才能操作

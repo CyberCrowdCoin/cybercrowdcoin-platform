@@ -49,7 +49,11 @@ router.post('/invite-candidate', tokenCheck, async function (ctx, next) {
     const body = ctx.request.body
     body.employer = ctx.session.username
     const data = await sendInvitation(body)
-    ctx.body = new SuccessModel(data)
+    if(data){
+        ctx.body = new SuccessModel(data)
+    } else {
+        ctx.body = new ErrorModel('invite candidate failed')
+    }
 
 })
 
@@ -57,13 +61,18 @@ router.post('/send_proposal', tokenCheck, async function (ctx, next) {
     const body = ctx.request.body
     body.candidate = ctx.session.username
     const data = await sendProposal(body)
-    ctx.body = new SuccessModel(data)
+    if(data){
+        ctx.body = new SuccessModel(data)
+    } else {
+        ctx.body = new ErrorModel('send proposal failed')
+    }
+    
 
 })
 
 router.post('/accept-invitation', tokenCheck, async function (ctx, next) {
     const candidateAddress = ctx.session.username;
-    const protocolId = ctx.query.protocolId
+    const protocolId = ctx.request.body.protocolId
     const val = await acceptInvitation(candidateAddress, protocolId)
     if (val) {
         ctx.body = new SuccessModel()
@@ -75,7 +84,7 @@ router.post('/accept-invitation', tokenCheck, async function (ctx, next) {
 // refuseInvitation
 router.post('/refuse-invitation', tokenCheck, async function (ctx, next) {
     const candidateAddress = ctx.session.username;
-    const protocolId = ctx.query.protocolId
+    const protocolId = ctx.request.body.protocolId
     const val = await refuseInvitation(candidateAddress, protocolId)
     if (val) {
         ctx.body = new SuccessModel()
@@ -87,7 +96,7 @@ router.post('/refuse-invitation', tokenCheck, async function (ctx, next) {
 // accept-proposal
 router.post('/accept-proposal', tokenCheck, async function (ctx, next) {
     const employer = ctx.session.username;
-    const protocolId = ctx.query.protocolId
+    const protocolId = ctx.request.body.protocolId
     const val = await acceptProposal(employer, protocolId)
     if (val) {
         ctx.body = new SuccessModel()
@@ -99,7 +108,7 @@ router.post('/accept-proposal', tokenCheck, async function (ctx, next) {
 // refuseProposal
 router.post('/refuse-proposal', tokenCheck, async function (ctx, next) {
     const employer = ctx.session.username;
-    const protocolId = ctx.query.protocolId
+    const protocolId = ctx.request.body.protocolId
     const val = await refuseProposal(employer, protocolId)
     if (val) {
         ctx.body = new SuccessModel()
@@ -111,7 +120,7 @@ router.post('/refuse-proposal', tokenCheck, async function (ctx, next) {
 // cancel-invitation
 router.post('/cancel-invitation', tokenCheck, async function (ctx, next) {
     const employer = ctx.session.username;
-    const protocolId = ctx.query.protocolId
+    const protocolId = ctx.request.body.protocolId
     const val = await cancelInvitation(employer, protocolId)
     if (val) {
         ctx.body = new SuccessModel()
@@ -122,7 +131,7 @@ router.post('/cancel-invitation', tokenCheck, async function (ctx, next) {
 
 router.post('/finish-protocol', tokenCheck, async function (ctx, next) {
     const candidateAddress = ctx.session.username;
-    const protocolId = ctx.query.protocolId
+    const protocolId = ctx.request.body.protocolId
     const val = await finishProtocol(candidateAddress, protocolId)
     if (val) {
         ctx.body = new SuccessModel()

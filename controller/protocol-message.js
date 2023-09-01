@@ -29,7 +29,7 @@ async function getDetail(id) {
 }
 
 
-async function newProtocolMessage(creator, type, protocolId, content) {
+async function newProtocolMessage(creator, protocolId, type, content) {
     // 创建MySQL记录
     const res = await ProtocolMessage.create({
         type,

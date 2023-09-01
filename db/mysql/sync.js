@@ -1,7 +1,8 @@
 const seq = require('./seq')
 
 // 需要同步的模型
-require('./model/User')
+require('./model/Protocol')
+require('./model/ProtocolMessage')
 
 seq.authenticate().then(() => {
     console.log('sequelize connect success.')

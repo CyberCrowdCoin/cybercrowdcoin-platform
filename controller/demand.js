@@ -1,10 +1,9 @@
 const Sequelize = require('sequelize')
 const xss = require('xss')
 const Demand = require('../db/mysql/model/Demand')
+const Protocol = require('../db/mysql/model/Protocol')
 const { addToIpfs } = require('../db/ipfs/ipfs')
-const { DemandStatusEnum } = require('../model/enum')
-const protocol = require('./protocol')
-
+const { DemandStatusEnum, ProtocolStatusEnum } = require('../model/enum')
 
 async function getList(creator = '', title = '', status = '', contract = '') {
     // 拼接查询条件
@@ -71,6 +70,7 @@ async function newDemand(demandData = {}) {
     }
     let entity = JSON.stringify(meta)
     const ipfsurl = await addToIpfs(entity);
+    console.info('ipfsurl ------->  ', ipfsurl)
     // 上链 todo
 
     // 更新demand表contract字段
@@ -87,7 +87,7 @@ async function endDemand(id, creator = '') {
         return false
     }
     // check demand下 无进行中的protocol
-    const protocolList = await protocol.getList(id, null)
+    const protocolList = await getProtocolList(id, null)
     if (protocolList) {
         for (const protocol of protocolList) {
             if (protocol.status == ProtocolStatusEnum.ACTIVE ||
@@ -101,6 +101,16 @@ async function endDemand(id, creator = '') {
     // 更新demand status
     await updateDemandStatus(id, creator, DemandStatusEnum.COMPLETED)
     return true
+}
+
+async function getProtocolList(demandId){
+
+    const protocols = await Protocol.findAll({
+        where: {
+            demandId,
+        }
+    })
+    return protocols
 }
 
 async function updateDemandContract(id, contract = '') {

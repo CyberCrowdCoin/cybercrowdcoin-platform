@@ -44,8 +44,7 @@ router.post('/add-skill', tokenCheck, async function (ctx, next) {
 })
 
 router.post('/delete-skill', tokenCheck, async function (ctx, next) {
-    body.user = ctx.session.username
-    const data = await deleteSkill(ctx.request.id)
+    const data = await deleteSkill(ctx.request.body.id, ctx.session.username)
     ctx.body = new SuccessModel(data)
 
 })

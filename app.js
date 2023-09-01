@@ -16,6 +16,7 @@ const user = require('./routes/user')
 const demand = require('./routes/demand')
 const candidate = require('./routes/candidate')
 const protocol = require('./routes/protocol')
+const protocolMessage = require('./routes/protocol-message')
 
 // error handler
 onerror(app)
@@ -74,6 +75,8 @@ app.use(user.routes(), user.allowedMethods())
 app.use(demand.routes(), demand.allowedMethods())
 app.use(candidate.routes(), candidate.allowedMethods())
 app.use(protocol.routes(), protocol.allowedMethods())
+app.use(protocolMessage.routes(), protocolMessage.allowedMethods())
+
 
 // error-handling
 app.on('error', (err, ctx) => {

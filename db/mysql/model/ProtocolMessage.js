@@ -2,7 +2,7 @@ const Sequelize = require('sequelize')
 const seq = require('../seq')
 
 const ProtocolMessage = seq.define(
-    'protocol', // 对应数据库的 protocols 表（英文复数）
+    'protocol_message', // 对应数据库的 protocol_messages 表（英文复数）
     {
         /* 不用定义 id ，seq 会自动增加 */
 

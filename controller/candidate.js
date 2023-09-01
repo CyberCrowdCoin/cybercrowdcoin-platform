@@ -42,9 +42,9 @@ async function getDetailByUser(user) {
 
 async function newCandidate(candidateData = {}) {
     const qualification = xss(candidateData.qualification)
-    const user = demandData.user
-    const gender = xss(demandData.gender)
-    const age = xss(demandData.age)
+    const user = candidateData.user
+    const gender = xss(candidateData.gender)
+    const age = xss(candidateData.age)
     const status = CandidateStatusEnum.VALID
 
     // 创建MySQL记录
@@ -61,13 +61,14 @@ async function newCandidate(candidateData = {}) {
 }
 
 async function addSkills(skillData = {}) {
-    const user = demandData.user
+    const user = skillData.user
     const candidate = await getDetailByUser(user)
     if(candidate == null){
         return;
     }
 
-    const skills = xss(skillData.skills)
+    const skills = skillData.skills
+    console.info("skills ---> ", skills)
     const candidateId = candidate.id;
     for (let i = 0; i < skills.length; ++i) {
         const skill = skills[i];
@@ -78,14 +79,13 @@ async function addSkills(skillData = {}) {
     }
 }
 
-async function deleteSkill(id) {
-    const user = demandData.user
+async function deleteSkill(id, user) {
     const candidate = await getDetailByUser(user)
     if(candidate == null){
         return;
     }
     const candidateId = candidate.id
-    await Candidate.destroy({
+    await CandidateSkill.destroy({
         where: {
             id,
             candidateId
