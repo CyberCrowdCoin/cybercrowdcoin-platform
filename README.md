@@ -1,4 +1,5 @@
-
+## 设计文档
+https://www.yuque.com/g/shaomo-flpaj/zifkwz/eia4rq77ag5bcyth/collaborator/join?token=Q0CV84eGXp6W7q5B&source=doc_collaborator# 《CCC业务架构(V1)》
 ## ipfs
 -- 启动
 Ipfs daemon
