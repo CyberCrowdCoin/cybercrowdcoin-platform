@@ -4,6 +4,7 @@ const {
     getDetail,
     newDemand,
     endDemand,
+    addDemandToIpfs
 } = require('../controller/demand')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 const { DemandStatusEnum } = require('../model/enum')
@@ -45,6 +46,14 @@ router.post('/new', tokenCheck, async function (ctx, next) {
     const body = ctx.request.body
     body.creator = ctx.session.username
     const data = await newDemand(body)
+    ctx.body = new SuccessModel(data)
+
+})
+
+router.post('/add-ipfs', tokenCheck, async function (ctx, next) {
+    const body = ctx.request.body
+    body.creator = ctx.session.username
+    const data = await addDemandToIpfs(body)
     ctx.body = new SuccessModel(data)
 
 })

@@ -4,6 +4,7 @@ const Demand = require('../db/mysql/model/Demand')
 const Protocol = require('../db/mysql/model/Protocol')
 const { addToIpfs } = require('../db/ipfs/ipfs')
 const { DemandStatusEnum, ProtocolStatusEnum } = require('../model/enum')
+const {endDemandContract} = require('./contract')
 
 async function getList(creator = '', title = '', status = '', contract = '') {
     // 拼接查询条件
@@ -35,8 +36,7 @@ async function getDetail(id) {
     return demand.dataValues
 }
 
-async function newDemand(demandData = {}) {
-    let contract = ''
+async function addDemandToIpfs(demandData = {}) {
     const title = xss(demandData.title)
     const creator = demandData.creator
     const category = xss(demandData.category)
@@ -45,8 +45,29 @@ async function newDemand(demandData = {}) {
     const phone = xss(demandData.phone)
     const requiredSkill = xss(demandData.requiredSkill)
     const tokenAmount = xss(demandData.tokenAmount)
-    const tokenAddress = ''
+    // 存储IPFS
+    let meta = {
+        title: title, creator: creator, category: category, description: description, status: status,
+        phone: phone, requiredSkill: requiredSkill, tokenAmount: tokenAmount
+    }
+    let entity = JSON.stringify(meta)
+    const ipfsurl = await addToIpfs(entity);
+    return {
+        url: ipfsurl
+    }
+}
 
+async function newDemand(demandData = {}) {
+    const title = xss(demandData.title)
+    const creator = demandData.creator
+    const category = xss(demandData.category)
+    const description = xss(demandData.description)
+    const status = DemandStatusEnum.OPEN
+    const phone = xss(demandData.phone)
+    const requiredSkill = xss(demandData.requiredSkill)
+    const tokenAmount = xss(demandData.tokenAmount)
+    const contract = xss(demandData.contract)
+    const tokenAddress = ''
     // 创建MySQL记录
     const res = await Demand.create({
         contract,
@@ -60,24 +81,8 @@ async function newDemand(demandData = {}) {
         tokenAmount,
         tokenAddress
     })
-
-    const id = res.dataValues.id
-
-    // 存储IPFS
-    let meta = {
-        id: id, title: title, creator: creator, category: category, description: description, status: status,
-        phone: phone, requiredSkill: requiredSkill, tokenAmount: tokenAmount
-    }
-    let entity = JSON.stringify(meta)
-    const ipfsurl = await addToIpfs(entity);
-    console.info('ipfsurl ------->  ', ipfsurl)
-    // 上链 todo
-
-    // 更新demand表contract字段
-    contract = 'test contract'
-    await updateDemandContract(id, contract)
     return {
-        id: id
+        id: res.dataValues.id
     }
 }
 
@@ -96,8 +101,8 @@ async function endDemand(id, creator = '') {
                 return false;
         }
     }
-    // 调用合约end demand 退还押金 todo
-
+    // 调用合约end demand 退还押金
+    await endDemandContract(demandData.contract, creator, demandData.tokenAmount)
     // 更新demand status
     await updateDemandStatus(id, creator, DemandStatusEnum.COMPLETED)
     return true
@@ -158,4 +163,5 @@ module.exports = {
     endDemand,
     updateDemandContract,
     updateDemandStatus,
+    addDemandToIpfs
 }
