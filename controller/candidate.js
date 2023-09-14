@@ -20,17 +20,7 @@ async function getList() {
     return list.map(item => item.dataValues)
 }
 
-async function getDetail(id) {
-    const candidate = await Candidate.findOne({
-        where: {
-            id,
-        }
-    })
-    if (candidate == null) return null
-    return candidate.dataValues
-}
-
-async function getDetailByUser(user) {
+async function getDetail(user) {
     const candidate = await Candidate.findOne({
         where: {
             user,
@@ -61,42 +51,40 @@ async function newCandidate(candidateData = {}) {
 }
 
 async function addSkills(skillData = {}) {
-    const user = skillData.user
-    const candidate = await getDetailByUser(user)
-    if(candidate == null){
+    const candidate = skillData.user
+    const candidateData = await getDetailByUser(candidate)
+    if(candidateData == null){
         return;
     }
 
     const skills = skillData.skills
-    console.info("skills ---> ", skills)
-    const candidateId = candidate.id;
     for (let i = 0; i < skills.length; ++i) {
         const skill = skills[i];
         await CandidateSkill.create({
-            candidateId,
+            candidate,
             skill
         })
     }
 }
 
 async function deleteSkill(id, user) {
-    const candidate = await getDetailByUser(user)
-    if(candidate == null){
+    const candidateData = await getDetailByUser(user)
+    if(candidateData == null){
         return;
     }
-    const candidateId = candidate.id
+    const candidate = user
     await CandidateSkill.destroy({
         where: {
             id,
-            candidateId
+            candidate
         }
     })
 }
 
-async function getSkillListByCandidate(candidateId) {
+async function getSkillListByCandidate(candidate) {
     // 执行查询
     const list = await CandidateSkill.findAll({
-        where: {candidateId},
+        where: {candidate},
         order: [
             ['id', 'desc'] // 排序
         ]
@@ -111,6 +99,5 @@ module.exports = {
     newCandidate,
     addSkills,
     deleteSkill,
-    getDetailByUser,
     getSkillListByCandidate,
 }

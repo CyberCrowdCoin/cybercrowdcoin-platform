@@ -32,10 +32,9 @@ router.get('/candidate-protocol-list', tokenCheck, async function (ctx, next) {
         ctx.body = new ErrorModel('未登录')
         return
     }
-    const candidateAddress =  ctx.session.username
-    const candidate = await getDetailByUser(candidateAddress)
+    const candidate =  ctx.session.username
     
-    const listData = await getList(null, candidate.id)
+    const listData = await getList(null, candidate)
     ctx.body = new SuccessModel(listData)
 })
 
@@ -83,9 +82,9 @@ router.post('/accept-invitation', tokenCheck, async function (ctx, next) {
 
 // refuseInvitation
 router.post('/refuse-invitation', tokenCheck, async function (ctx, next) {
-    const candidateAddress = ctx.session.username;
+    const candidate = ctx.session.username;
     const protocolId = ctx.request.body.protocolId
-    const val = await refuseInvitation(candidateAddress, protocolId)
+    const val = await refuseInvitation(candidate, protocolId)
     if (val) {
         ctx.body = new SuccessModel()
     } else {
@@ -130,9 +129,9 @@ router.post('/cancel-invitation', tokenCheck, async function (ctx, next) {
 })
 
 router.post('/finish-protocol', tokenCheck, async function (ctx, next) {
-    const candidateAddress = ctx.session.username;
+    const candidate = ctx.session.username;
     const protocolId = ctx.request.body.protocolId
-    const val = await finishProtocol(candidateAddress, protocolId)
+    const val = await finishProtocol(candidate, protocolId)
     if (val) {
         ctx.body = new SuccessModel()
     } else {

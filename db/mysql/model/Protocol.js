@@ -23,11 +23,11 @@ const Protocol = seq.define(
             allowNUll: false,
             comment: '雇主'
         },
-        
-        candidateId: {
-            type: Sequelize.BIGINT,
-            field: 'candidate_id',
-            allowNUll: false
+
+        candidate: {
+            type: Sequelize.STRING,
+            allowNUll: false,
+            comment: 'candidate'
         },
 
         activeDate: {

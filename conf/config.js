@@ -10,25 +10,25 @@ let CCC_CONTRACT_CONF
 if (env === 'dev') {
     // contract 
     CCCWB_CONTRACT_CONF = {
-        address: '0xd42E4F796FCb29DE5D609ffdf179aED1e27A3E27',
-        rpcurl: 'ws://127.0.0.1:8545',
+        address: '0x1963108B61774716267F7051f8476aa82a371A03',
+        rpcurl: 'http://127.0.0.1:8545',
         gas: 3000000
     }
     // ccc token
     CCC_CONTRACT_CONF = {
-        address: '0x94f6f02F909ca40DEd5cBEd1cb4cAB48753F73A5'
+        address: '0xB76C881642ed032Be6913Fb12f6B86412Da7C43d'
     }
 }
 
 if (env === 'production') {
     // contract 
     CCCWB_CONTRACT_CONF = {
-        address: '0x74490ca7e24347713b788a63eAc7532166417445',
+        address: '0x1963108B61774716267F7051f8476aa82a371A03',
         rpcurl: ''
     }
     // ccc token
     CCC_CONTRACT_CONF = {
-        address: '0x2b7832B4b3594FDEA11D44a9818C29d330e3C010'
+        address: '0xB76C881642ed032Be6913Fb12f6B86412Da7C43d'
     }
 }
 

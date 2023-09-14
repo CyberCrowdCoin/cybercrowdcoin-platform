@@ -19,9 +19,9 @@ router.get('/all-list', async function (ctx, next) {
 })
 
 router.get('/detail', async function (ctx, next) {
-    const data = await getDetail(ctx.query.id);
+    const data = await getDetail(ctx.session.username);
     if(data != null) {
-        const skills = await getSkillListByCandidate(data.id)
+        const skills = await getSkillListByCandidate(ctx.session.username)
         data.skills = skills;
     }
     ctx.body = new SuccessModel(data)
