@@ -7,7 +7,6 @@ async function getListByProtocolId(protocolId) {
     // 拼接查询条件
     const whereOpt = {}
     if (protocolId) whereOpt.protocolId = protocolId
-
     // 执行查询
     const list = await ProtocolMessage.findAll({
         where: whereOpt,
