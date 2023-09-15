@@ -2,8 +2,8 @@ const Sequelize = require('sequelize')
 const xss = require('xss')
 const Candidate = require('../db/mysql/model/Candidate')
 const CandidateSkill = require('../db/mysql/model/CandidateSkill')
-const {addToIpfs} = require('../db/ipfs/ipfs')
-const {CandidateStatusEnum} = require('../model/enum')
+const { addToIpfs } = require('../db/ipfs/ipfs')
+const { CandidateStatusEnum } = require('../model/enum')
 
 
 async function getList() {
@@ -37,23 +37,26 @@ async function newCandidate(candidateData = {}) {
     const age = xss(candidateData.age)
     const status = CandidateStatusEnum.VALID
 
-    // 创建MySQL记录
-    const res = await Candidate.create({
+    const [candidate, created] = await Candidate.upsert({
         user,
         status,
         qualification,
         gender,
         age,
-    })
+    }, { where: { user } });
+
     return {
-        id: res.dataValues.id
-    }
+        id: candidate.id,
+    };
+    // return {
+    //     id: res.dataValues.id
+    // }
 }
 
 async function addSkills(skillData = {}) {
     const candidate = skillData.user
-    const candidateData = await getDetailByUser(candidate)
-    if(candidateData == null){
+    const candidateData = await getDetail(candidate)
+    if (candidateData == null) {
         return;
     }
 
@@ -68,8 +71,8 @@ async function addSkills(skillData = {}) {
 }
 
 async function deleteSkill(id, user) {
-    const candidateData = await getDetailByUser(user)
-    if(candidateData == null){
+    const candidateData = await getDetail(user)
+    if (candidateData == null) {
         return;
     }
     const candidate = user
@@ -84,7 +87,7 @@ async function deleteSkill(id, user) {
 async function getSkillListByCandidate(candidate) {
     // 执行查询
     const list = await CandidateSkill.findAll({
-        where: {candidate},
+        where: { candidate },
         order: [
             ['id', 'desc'] // 排序
         ]

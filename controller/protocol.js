@@ -6,8 +6,7 @@ const { ProtocolStatusEnum, ProtocolMessageTypeEnum, DemandStatusEnum } = requir
 const candidate = require('./candidate')
 const demand = require('./demand')
 const proposalMessage = require('./protocol-message')
-const Demand = require('../db/mysql/model/Demand')
-
+const addCandidateContract = require('./contract')
 async function getList(demandId, candidate) {
     // 拼接查询条件
     const whereOpt = {}
@@ -47,10 +46,8 @@ async function sendInvitation(protocolData = {}) {
     }
     const employer = protocolData.employer
     // 上传IPFS
-    const ipfsurl = await addProtocolToIpfs(demandData.contract, employer, candidateData.user);
-    console.info('sendInvitation ipfsurl---->', ipfsurl)
-    // 上链 todo
-    
+    // const ipfsurl = await addProtocolToIpfs(demandData.contract, employer, candidateData.user);
+    // console.info('sendInvitation ipfsurl---->', ipfsurl)    
     // 入protocol表
     const id = await newProtocol(demandId, ProtocolStatusEnum.INVITE_PENDING, employer, candidate)
     // 增加一个invitation类型消息
@@ -137,9 +134,12 @@ async function acceptInvitation(candidate, protocolId){
         return false
     }
     // 更新protocol表
-    await updateProtocolActive(protocolId)
+    // await updateProtocolActive(protocolId)
+    await updateProtocolStatus(protocolId, ProtocolStatusEnum.PROPOSAL_PENDING);
     // 发送accept-invitation消息
     await proposalMessage.newProtocolMessage(candidate, protocolId, ProtocolMessageTypeEnum.INVITATION_ACCEPT, '')
+    await proposalMessage.newProtocolMessage(candidate, protocolId, ProtocolMessageTypeEnum.PROPOSAL_SEND, '')
+
     return true
 }
 
@@ -184,11 +184,11 @@ async function acceptProposal(employer, protocolId){
     // 上传IPFS
     const ipfsurl = await addProtocolToIpfs(demandData.contract, employer, candidateData.user)
     // 上链 ToDo
+    await addCandidateContract(demandData.contract, employer, candidateData.user, ipfsurl);
     // 更新protocol表
     await updateProtocolActive(protocolId)
     // 发送accept-proposal消息 todo
     await proposalMessage.newProtocolMessage(employer, protocolId, ProtocolMessageTypeEnum.PROPOSAL_ACCETP, '')
-
     return true
 }
 

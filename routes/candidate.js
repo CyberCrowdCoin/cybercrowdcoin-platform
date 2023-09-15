@@ -19,9 +19,10 @@ router.get('/all-list', async function (ctx, next) {
 })
 
 router.get('/detail', async function (ctx, next) {
-    const data = await getDetail(ctx.session.username);
+    const user = ctx.query.user
+    const data = await getDetail(user);
     if(data != null) {
-        const skills = await getSkillListByCandidate(ctx.session.username)
+        const skills = await getSkillListByCandidate(user)
         data.skills = skills;
     }
     ctx.body = new SuccessModel(data)
@@ -33,6 +34,12 @@ router.post('/register', tokenCheck, async function (ctx, next) {
     const data = await newCandidate(body)
     ctx.body = new SuccessModel(data)
 
+})
+
+router.get('/skill-list', async function (ctx, next) {
+    const candidate = ctx.query.candidate
+    const data = await getSkillListByCandidate(candidate)
+    ctx.body = new SuccessModel(data)
 })
 
 router.post('/add-skill', tokenCheck, async function (ctx, next) {
