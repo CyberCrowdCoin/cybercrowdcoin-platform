@@ -35,8 +35,9 @@ async function addCandidateContract(demandAddress, creator, candidate, ipfsUrl) 
         from: creator, // 替换成你的以太坊地址
         gas: gas, // 设置合适的 gas 限制
     };
-    console.info("addCandidate", demandAddress, candidate, ipfsUrl);
+    
     const ipfsUrlBytes = web3.utils.asciiToHex(ipfsUrl);
+    console.info("addCandidate", demandAddress, creator, candidate, ipfsUrlBytes);
     await contract.methods.addCandidate(demandAddress, candidate, ipfsUrlBytes)
         .send(txOpts)
         .on('transactionHash', (hash) => {
