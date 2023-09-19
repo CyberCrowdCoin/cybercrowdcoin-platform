@@ -63,7 +63,7 @@ async function sendProposal(protocolData = {}) {
     const demandId = protocolData.demandId
     const candidate = protocolData.candidate
     const demandData = await demand.getDetail(demandId)
-    const candidateData = await candidate.getDetailByUser(candidate)
+    const candidateData = await candidate.getDetail(candidate)
     const checkResult = await newProtocolCheck(demandData, candidateData);
     if(!checkResult){
         return null
