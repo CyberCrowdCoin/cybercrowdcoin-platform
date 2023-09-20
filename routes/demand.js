@@ -13,11 +13,10 @@ const tokenCheck = require('../middleware/tokenCheck')
 router.prefix('/ccc/demand')
 
 router.get('/all-list', async function (ctx, next) {
-    const creator = ctx.query.creator || ''
     const title = ctx.query.title || ''
     const status = ctx.query.status || ''
-    const contract = ctx.query.contract || ''
-    const listData = await getList(creator, title, status, contract)
+    const category = ctx.query.category || ''
+    const listData = await getList(title, status, category)
     ctx.body = new SuccessModel(listData)
 })
 
