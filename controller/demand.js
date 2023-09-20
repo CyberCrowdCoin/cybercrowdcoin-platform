@@ -43,12 +43,12 @@ async function addDemandToIpfs(demandData = {}) {
     const description = xss(demandData.description)
     const status = DemandStatusEnum.OPEN
     const phone = xss(demandData.phone)
-    const requiredSkill = xss(demandData.requiredSkill)
+    const budget = xss(demandData.budget)
     const tokenAmount = xss(demandData.tokenAmount)
     // 存储IPFS
     let meta = {
         title: title, creator: creator, category: category, description: description, status: status,
-        phone: phone, requiredSkill: requiredSkill, tokenAmount: tokenAmount
+        phone: phone, budget: budget, tokenAmount: tokenAmount
     }
     let entity = JSON.stringify(meta)
     const ipfsurl = await addToIpfs(entity);
@@ -64,10 +64,11 @@ async function newDemand(demandData = {}) {
     const description = xss(demandData.description)
     const status = DemandStatusEnum.OPEN
     const phone = xss(demandData.phone)
-    const requiredSkill = xss(demandData.requiredSkill)
+    const budget = xss(demandData.budget)
     const tokenAmount = xss(demandData.tokenAmount)
     const contract = xss(demandData.contract)
     const tokenAddress = ''
+    const requiredSkill = ''
     // 创建MySQL记录
     const res = await Demand.create({
         contract,
@@ -79,7 +80,8 @@ async function newDemand(demandData = {}) {
         phone,
         requiredSkill,
         tokenAmount,
-        tokenAddress
+        tokenAddress,
+        budget
     })
     return {
         id: res.dataValues.id

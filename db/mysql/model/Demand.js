@@ -60,7 +60,12 @@ const Demand = seq.define(
             field: 'token_address',
             type: Sequelize.STRING,
             allowNUll: true
-        }
+        },
+        budget: {
+            field: 'budget',
+            type: Sequelize.BIGINT,
+            allowNUll: false
+        },
 
         /* 不用定义 createTime ，seq 会自动增加 createdAt 和 updatedAt */
     }
