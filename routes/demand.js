@@ -16,7 +16,7 @@ router.get('/all-list', async function (ctx, next) {
     const title = ctx.query.title || ''
     const status = ctx.query.status || ''
     const category = ctx.query.category || ''
-    const listData = await getList(title, status, category)
+    const listData = await getList('', title, status, category)
     ctx.body = new SuccessModel(listData)
 })
 
