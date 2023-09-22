@@ -16,7 +16,7 @@ if (env === 'dev') {
 
     // ipfs
     IPFS_CONF = {
-        host: {domain:"127.0.0.1", url_prefix:"http://127.0.0.1:8090/ipfs/"},
+        host: {domain:"127.0.0.1", url_prefix:"http://127.0.0.1:8080/ipfs/"},
         port: 5001,
         protocol: 'http'
     }
@@ -34,7 +34,7 @@ if (env === 'production') {
 
     // ipfs
     IPFS_CONF = {
-        host: {domain:"127.0.0.1", url_prefix:"http://127.0.0.1:8090/ipfs/"},
+        host: {domain:"127.0.0.1", url_prefix:"https://ipfs.io/ipfs/"},
         port: 5001,
         protocol: 'http'
     }

@@ -6,10 +6,11 @@ const { addToIpfs } = require('../db/ipfs/ipfs')
 const { DemandStatusEnum, ProtocolStatusEnum } = require('../model/enum')
 const {endDemandContract} = require('./contract')
 
-async function getList(title = '', status = '', category = '') {
+async function getList(creator = '', title = '', status = '', category = '') {
     // 拼接查询条件
     const whereOpt = {}
     if (category) whereOpt.category = category
+    if (creator) whereOpt.creator = creator
     if (status) whereOpt.status = status
     if (title) whereOpt.title = {
         [Sequelize.Op.like]: `%${title}%` // 模糊查询

@@ -11,12 +11,8 @@ const ipfs =  ipfsClient.create({
 
 async function addToIpfs(entity ={}) {
     try {
-      const added = await ipfs.add(entity, {
-        // Other options you might be using
-        // ...
-        duplex: true, // Configure the duplex option
-     });
-      const cid = added.path;
+      const added = await ipfs.add(entity);
+      const cid = added.path.toString();
       const rst = IPFS_CONF.host.url_prefix + cid;
       return rst;
   } catch (error) {
