@@ -1,5 +1,5 @@
 const ipfsClient = require('ipfs-http-client');
-// import { ipfsClient } from "ipfs-http-client";
+const axios = require('axios')
 
 const { IPFS_CONF } = require('../../conf/db')
 
@@ -21,4 +21,9 @@ async function addToIpfs(entity ={}) {
   }
 }
 
-module.exports = { addToIpfs }
+function getFromIpfs(uri) {
+  const res = axios.get(uri);
+    return res.data
+}
+
+module.exports = { addToIpfs, getFromIpfs}

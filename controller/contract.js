@@ -2,7 +2,7 @@ const { Web3 } = require('web3');
 const CCCWeb = require('../contract/build/CCCWeb.json');
 const { CCCWB_CONTRACT_CONF, CCC_CONTRACT_CONF } = require('../conf/config')
 // 在模块顶部初始化合约对象
-const web3 = new Web3(new Web3.providers.HttpProvider(CCCWB_CONTRACT_CONF.rpcurl));
+const web3 = new Web3(new Web3.providers.WebsocketProvider(CCCWB_CONTRACT_CONF.websocketurl));
 const cccWebAddress = CCCWB_CONTRACT_CONF.address;
 const gas = CCCWB_CONTRACT_CONF.gas;
 const contract = new web3.eth.Contract(CCCWeb.abi, cccWebAddress);
@@ -90,5 +90,5 @@ function getTokenValue(tokenAmount) {
 }
 
 module.exports = {
-    endDemandContract,addCandidateContract
+    endDemandContract,addCandidateContract,contract
 }

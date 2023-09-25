@@ -10,8 +10,9 @@ let CCC_CONTRACT_CONF
 if (env === 'dev') {
     // contract 
     CCCWB_CONTRACT_CONF = {
-        address: '0xC89A35e335Bdc36F5841F5Bd706c6B3Cb97f26e7',
+        address: '0x2b7303e1CB1f62b4d9281E46fac5EBc79AdcaBCB',
         rpcurl: 'http://127.0.0.1:8545',
+        websocketurl: 'ws://127.0.0.1:8545',
         gas: 3000000
     }
     // ccc token

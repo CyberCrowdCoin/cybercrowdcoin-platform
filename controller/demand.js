@@ -2,9 +2,50 @@ const Sequelize = require('sequelize')
 const xss = require('xss')
 const Demand = require('../db/mysql/model/Demand')
 const Protocol = require('../db/mysql/model/Protocol')
-const { addToIpfs } = require('../db/ipfs/ipfs')
+const { addToIpfs, getFromIpfs } = require('../db/ipfs/ipfs')
 const { DemandStatusEnum, ProtocolStatusEnum } = require('../model/enum')
-const {endDemandContract} = require('./contract')
+const { endDemandContract } = require('./contract')
+const contract = require('./contract'); // 导入合约对象
+const ethers = require('ethers');
+
+
+
+contract.contract.events.DemandCreated({
+    fromBlock: 0,
+    toBlock: 'latest'
+}, function (error, event) { })
+    .on('data', function (event) {
+        // 根据contract查找记录
+        // console.log("hash: " + event.transactionHash +"     DemandCreated: " +event.returnValues.newDemand, 
+        // + "     creator: " + event.returnValues.creator); // same results as the optional callback above
+
+        const contract = event.returnValues.newDemand;
+        const ipfsData = event.returnValues.ipfsData;
+        const creator = event.returnValues.creator;
+        const demandData = getByContract(contract);
+        if (contract && demandData == null) {
+            // 插入
+            console.log("step here")
+            try {
+                // 使用 ethers.utils.hexDataSlice 将字节字符串还原为字节数组
+                const demandBytesArray = ethers.utils.arrayify(ipfsData);
+
+                // 使用 Buffer.from 将字节数组转换为 JSON 字符串
+                const jsonString = Buffer.from(demandBytesArray).toString('utf8');
+
+                // 使用 JSON.parse 将 JSON 字符串解析为对象
+                const demand = JSON.parse(jsonString);
+                demand.creator = creator;
+                demand.contract = contract;
+                // console.info("demandJson=    ", demand)
+                newDemand(demand);
+            } catch (error) {
+                console.error(error)
+            }
+
+
+        }
+    })
 
 async function getList(creator = '', title = '', status = '', category = '') {
     // 拼接查询条件
@@ -36,6 +77,16 @@ async function getDetail(id) {
     return demand.dataValues
 }
 
+function getByContract(contract) {
+    const demand = Demand.findOne({
+        where: {
+            contract,
+        }
+    })
+    if (demand == null) return null
+    return demand.dataValues
+}
+
 async function addDemandToIpfs(demandData = {}) {
     const title = xss(demandData.title)
     const creator = demandData.creator
@@ -57,20 +108,20 @@ async function addDemandToIpfs(demandData = {}) {
     }
 }
 
-async function newDemand(demandData = {}) {
-    const title = xss(demandData.title)
+function newDemand(demandData = {}) {
+    const title = demandData.title
     const creator = demandData.creator
-    const category = xss(demandData.category)
-    const description = xss(demandData.description)
+    const category = demandData.category
+    const description = demandData.description
     const status = DemandStatusEnum.OPEN
-    const phone = xss(demandData.phone)
-    const budget = xss(demandData.budget)
-    const tokenAmount = xss(demandData.tokenAmount)
-    const contract = xss(demandData.contract)
+    const phone = demandData.phone
+    const budget = demandData.budget
+    const tokenAmount = demandData.tokenAmount
     const tokenAddress = ''
     const requiredSkill = ''
+    const contract = demandData.contract
     // 创建MySQL记录
-    const res = await Demand.create({
+    Demand.create({
         contract,
         title,
         creator,
@@ -81,11 +132,9 @@ async function newDemand(demandData = {}) {
         requiredSkill,
         tokenAmount,
         tokenAddress,
-        budget
+        budget,
     })
-    return {
-        id: res.dataValues.id
-    }
+    
 }
 
 async function endDemand(id, creator = '') {
@@ -110,7 +159,7 @@ async function endDemand(id, creator = '') {
     return true
 }
 
-async function getProtocolList(demandId){
+async function getProtocolList(demandId) {
 
     const protocols = await Protocol.findAll({
         where: {
@@ -120,7 +169,7 @@ async function getProtocolList(demandId){
     return protocols
 }
 
-async function updateDemandContract(id, contract = '') {
+async function updateDemandContract(transHash, contract = '') {
     const res = await Demand.update(
         // 要更新的内容
         {
@@ -129,7 +178,7 @@ async function updateDemandContract(id, contract = '') {
         // 条件
         {
             where: {
-                id,
+                transHash,
             }
         }
     )
@@ -165,5 +214,5 @@ module.exports = {
     endDemand,
     updateDemandContract,
     updateDemandStatus,
-    addDemandToIpfs
+    addDemandToIpfs,
 }

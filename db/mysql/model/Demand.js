@@ -66,6 +66,13 @@ const Demand = seq.define(
             type: Sequelize.BIGINT,
             allowNUll: false
         },
+        // transHash: {
+        //     type: Sequelize.STRING,
+        //     allowNUll: false,
+        //     field: 'trans_hash',
+        //     comment: 'demand transaction hash'
+        // },
+
 
         /* 不用定义 createTime ，seq 会自动增加 createdAt 和 updatedAt */
     }

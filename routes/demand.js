@@ -41,14 +41,6 @@ router.get('/detail', async function (ctx, next) {
     ctx.body = new SuccessModel(data)
 })
 
-router.post('/new', tokenCheck, async function (ctx, next) {
-    const body = ctx.request.body
-    body.creator = ctx.session.username
-    const data = await newDemand(body)
-    ctx.body = new SuccessModel(data)
-
-})
-
 router.post('/add-ipfs', tokenCheck, async function (ctx, next) {
     const body = ctx.request.body
     body.creator = ctx.session.username
