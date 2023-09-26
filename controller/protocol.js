@@ -29,8 +29,13 @@ async function getDetail(id) {
             id,
         }
     })
-    if (protocol == null) return null
-    return protocol.dataValues
+    if (protocol !== null) {
+        // 找到了数据
+        return protocol.dataValues;
+    } else {
+        // 没有找到数据
+        return null;
+    }
 }
 
 // 登录账号为employer才能操作

@@ -35,6 +35,7 @@ async function newCandidate(candidateData = {}) {
     const user = candidateData.user
     const gender = xss(candidateData.gender)
     const age = xss(candidateData.age)
+    const phone = xss(candidateData.phone)
     const status = CandidateStatusEnum.VALID
 
     const [candidate, created] = await Candidate.upsert({
@@ -43,14 +44,13 @@ async function newCandidate(candidateData = {}) {
         qualification,
         gender,
         age,
+        phone,
     }, { where: { user } });
 
     return {
         id: candidate.id,
     };
-    // return {
-    //     id: res.dataValues.id
-    // }
+    
 }
 
 async function addSkills(skillData = {}) {

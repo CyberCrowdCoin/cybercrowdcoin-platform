@@ -23,7 +23,8 @@ contract.contract.events.DemandCreated({
         const ipfsData = event.returnValues.ipfsData;
         const creator = event.returnValues.creator;
         const demandData = getByContract(contract);
-        if (contract && demandData == null) {
+        // console.info("DemandCreated demandData ", contract, demandData)
+        if (contract && demandData === null) {
             // 插入
             console.log("step here")
             try {
@@ -73,8 +74,13 @@ async function getDetail(id) {
             id,
         }
     })
-    if (demand == null) return null
-    return demand.dataValues
+    if (demand !== null) {
+        // 找到了数据
+        return demand.dataValues;
+    } else {
+        // 没有找到数据
+        return null;
+    }
 }
 
 function getByContract(contract) {
@@ -83,8 +89,13 @@ function getByContract(contract) {
             contract,
         }
     })
-    if (demand == null) return null
-    return demand.dataValues
+    if (demand !== null) {
+        // 找到了数据
+        return demand.dataValues;
+    } else {
+        // 没有找到数据
+        return null;
+    }
 }
 
 async function addDemandToIpfs(demandData = {}) {

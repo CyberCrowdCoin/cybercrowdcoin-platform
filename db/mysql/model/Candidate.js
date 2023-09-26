@@ -29,7 +29,11 @@ const Candidate = seq.define(
         age: {
             type: Sequelize.INTEGER,
             allowNUll: false
-        }
+        },
+        phone: {
+            type: Sequelize.STRING,
+            allowNUll: false
+        },
 
         /* 不用定义 createTime ，seq 会自动增加 createdAt 和 updatedAt */
     }
