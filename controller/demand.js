@@ -14,16 +14,13 @@ contract.contract.events.DemandCreated({
     fromBlock: 0,
     toBlock: 'latest'
 }, function (error, event) { })
-    .on('data', function (event) {
+    .on('data', async function (event) {
         // 根据contract查找记录
-        // console.log("hash: " + event.transactionHash +"     DemandCreated: " +event.returnValues.newDemand, 
-        // + "     creator: " + event.returnValues.creator); // same results as the optional callback above
-
         const contract = event.returnValues.newDemand;
         const ipfsData = event.returnValues.ipfsData;
         const creator = event.returnValues.creator;
-        const demandData = getByContract(contract);
-        // console.info("DemandCreated demandData ", contract, demandData)
+        const demandData = await getByContract(contract);
+        console.info("DemandCreated demandData ", contract, demandData)
         if (contract && demandData === null) {
             // 插入
             console.log("step here")
@@ -43,8 +40,6 @@ contract.contract.events.DemandCreated({
             } catch (error) {
                 console.error(error)
             }
-
-
         }
     })
 
@@ -83,8 +78,8 @@ async function getDetail(id) {
     }
 }
 
-function getByContract(contract) {
-    const demand = Demand.findOne({
+async function getByContract(contract) {
+    const demand = await Demand.findOne({
         where: {
             contract,
         }
@@ -145,7 +140,7 @@ function newDemand(demandData = {}) {
         tokenAddress,
         budget,
     })
-    
+
 }
 
 async function endDemand(id, creator = '') {
