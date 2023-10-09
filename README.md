@@ -7,6 +7,10 @@ Ipfs daemon
 http://127.0.0.1:5001/webui
 -- 安装IPFS http
 npm install axios ipfs-http-client
+systemctl daemon-reload
+systemctl enable ipfs 
+systemctl start ipfs 
+systemctl status ipfs
 
 ## 安装ethers
 npm install ethers
@@ -16,4 +20,4 @@ brew install nginx
 npm install mysql2 sequelize
 
 ## 项目开发环境启动
-npm rum dev
+npm run dev
