@@ -1,0 +1,126 @@
+
+> cybercrowdcoin-platform@0.1.0 dev
+> cross-env NODE_ENV=dev ./node_modules/.bin/nodemon bin/www
+
+[33m[nodemon] 2.0.22[39m
+[33m[nodemon] to restart at any time, enter `rs`[39m
+[33m[nodemon] watching path(s): *.*[39m
+[33m[nodemon] watching extensions: js,mjs,json[39m
+[32m[nodemon] starting `node bin/www`[39m
+node:events:505
+    throw err; // Unhandled 'error' event
+    ^
+
+Error [ERR_UNHANDLED_ERROR]: Unhandled error. (ErrorEvent {
+  target: WebSocket {
+    _events: [Object: null prototype] {
+      open: [Function],
+      message: [Function],
+      close: [Function],
+      error: [Function]
+    },
+    _eventsCount: 4,
+    _maxListeners: undefined,
+    _binaryType: 'nodebuffer',
+    _closeCode: 1006,
+    _closeFrameReceived: false,
+    _closeFrameSent: false,
+    _closeMessage: '',
+    _closeTimer: null,
+    _extensions: {},
+    _protocol: '',
+    _readyState: 2,
+    _receiver: null,
+    _sender: null,
+    _socket: null,
+    _bufferedAmount: 0,
+    _isServer: false,
+    _redirects: 0,
+    _url: 'ws://127.0.0.1:8545',
+    _req: null,
+    [Symbol(kCapture)]: false
+  },
+  type: 'error',
+  message: 'connect ECONNREFUSED 127.0.0.1:8545',
+  error: Error: connect ECONNREFUSED 127.0.0.1:8545
+      at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1495:16) {
+    errno: -61,
+    code: 'ECONNREFUSED',
+    syscall: 'connect',
+    address: '127.0.0.1',
+    port: 8545
+  }
+})
+    at new NodeError (node:internal/errors:405:5)
+    at EventEmitter.emit (node:events:503:17)
+    at WebSocketProvider._onError (/Users/admin/projects/cybercrowdcoin/cybercrowdcoin-platform/node_modules/web3-utils/lib/commonjs/socket_provider.js:161:32)
+    at WebSocket.onError (/Users/admin/projects/cybercrowdcoin/cybercrowdcoin-platform/node_modules/ws/lib/event-target.js:140:16)
+    at WebSocket.emit (node:events:514:28)
+    at ClientRequest.<anonymous> (/Users/admin/projects/cybercrowdcoin/cybercrowdcoin-platform/node_modules/ws/lib/websocket.js:579:15)
+    at ClientRequest.emit (node:events:514:28)
+    at Socket.socketErrorListener (node:_http_client:501:9)
+    at Socket.emit (node:events:514:28)
+    at emitErrorNT (node:internal/streams/destroy:151:8) {
+  code: 'ERR_UNHANDLED_ERROR',
+  context: ErrorEvent {
+    target: WebSocket {
+      _events: [Object: null prototype] {
+        open: [Function: onOpen] { _listener: [Function: bound _onConnect] },
+        message: [Function: onMessage] {
+          _listener: [Function: bound _onMessage]
+        },
+        close: [Function: onClose] { _listener: [Function (anonymous)] },
+        error: [Function: onError] { _listener: [Function: bound _onError] }
+      },
+      _eventsCount: 4,
+      _maxListeners: undefined,
+      _binaryType: 'nodebuffer',
+      _closeCode: 1006,
+      _closeFrameReceived: false,
+      _closeFrameSent: false,
+      _closeMessage: '',
+      _closeTimer: null,
+      _extensions: {},
+      _protocol: '',
+      _readyState: 2,
+      _receiver: null,
+      _sender: null,
+      _socket: null,
+      _bufferedAmount: 0,
+      _isServer: false,
+      _redirects: 0,
+      _url: 'ws://127.0.0.1:8545',
+      _req: null,
+      [Symbol(kCapture)]: false
+    },
+    type: 'error',
+    message: 'connect ECONNREFUSED 127.0.0.1:8545',
+    error: Error: connect ECONNREFUSED 127.0.0.1:8545
+        at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1495:16) {
+      errno: -61,
+      code: 'ECONNREFUSED',
+      syscall: 'connect',
+      address: '127.0.0.1',
+      port: 8545
+    }
+  }
+}
+
+Node.js v18.17.0
+[31m[nodemon] app crashed - waiting for file changes before starting...[39m
+node:events:492
+      throw er; // Unhandled 'error' event
+      ^
+
+Error: read EIO
+    at TTY.onStreamRead (node:internal/stream_base_commons:217:20)
+Emitted 'error' event on ReadStream instance at:
+    at emitErrorNT (node:internal/streams/destroy:151:8)
+    at emitErrorCloseNT (node:internal/streams/destroy:116:3)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21) {
+  errno: -5,
+  code: 'EIO',
+  syscall: 'read'
+}
+
+Node.js v18.17.0
