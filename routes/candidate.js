@@ -10,6 +10,8 @@ const {
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 const { CandidateStatusEnum } = require('../model/enum')
 const tokenCheck = require('../middleware/tokenCheck')
+const checkWhitelist = require('../middleware/whitelistCheck')
+
 
 router.prefix('/ccc/candidate')
 
@@ -28,7 +30,7 @@ router.get('/detail', async function (ctx, next) {
     ctx.body = new SuccessModel(data)
 })
 
-router.post('/register', tokenCheck, async function (ctx, next) {
+router.post('/register', tokenCheck, checkWhitelist, async function (ctx, next) {
     const body = ctx.request.body
     body.user = ctx.session.username
     const data = await newCandidate(body)
@@ -42,7 +44,7 @@ router.get('/skill-list', async function (ctx, next) {
     ctx.body = new SuccessModel(data)
 })
 
-router.post('/add-skill', tokenCheck, async function (ctx, next) {
+router.post('/add-skill', tokenCheck, checkWhitelist, async function (ctx, next) {
     const body = ctx.request.body
     body.user = ctx.session.username
     const data = await addSkills(body)
@@ -50,7 +52,7 @@ router.post('/add-skill', tokenCheck, async function (ctx, next) {
 
 })
 
-router.post('/delete-skill', tokenCheck, async function (ctx, next) {
+router.post('/delete-skill', tokenCheck, checkWhitelist, async function (ctx, next) {
     const data = await deleteSkill(ctx.request.body.id, ctx.session.username)
     ctx.body = new SuccessModel(data)
 

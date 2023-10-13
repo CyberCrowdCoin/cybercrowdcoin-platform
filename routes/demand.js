@@ -9,6 +9,7 @@ const {
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 const { DemandStatusEnum } = require('../model/enum')
 const tokenCheck = require('../middleware/tokenCheck')
+const checkWhitelist = require('../middleware/whitelistCheck')
 
 router.prefix('/ccc/demand')
 
@@ -20,7 +21,7 @@ router.get('/all-list', async function (ctx, next) {
     ctx.body = new SuccessModel(listData)
 })
 
-router.get('/employer-demand-list', tokenCheck, async function (ctx, next) {
+router.get('/employer-demand-list', tokenCheck, checkWhitelist, async function (ctx, next) {
     if (ctx.session.username == null) {
         console.error('is admin, but no login')
         // 未登录
@@ -41,7 +42,7 @@ router.get('/detail', async function (ctx, next) {
     ctx.body = new SuccessModel(data)
 })
 
-router.post('/add-ipfs', tokenCheck, async function (ctx, next) {
+router.post('/add-ipfs', tokenCheck, checkWhitelist, async function (ctx, next) {
     const body = ctx.request.body
     body.creator = ctx.session.username
     const data = await addDemandToIpfs(body)
@@ -49,7 +50,7 @@ router.post('/add-ipfs', tokenCheck, async function (ctx, next) {
 
 })
 
-router.post('/end', tokenCheck, async function (ctx, next) {
+router.post('/end', tokenCheck, checkWhitelist, async function (ctx, next) {
     const creator = ctx.session.username
     const id = ctx.request.body.id
     const val = await endDemand(id, creator)

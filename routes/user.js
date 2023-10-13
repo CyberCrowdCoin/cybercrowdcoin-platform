@@ -1,8 +1,20 @@
 const router = require('koa-router')()
 const { generateNonce, checkSign } = require('../controller/user')
+const { checkWhitelist } = require('../controller/whitelist-user')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 
 router.prefix('/ccc/user')
+
+router.get('/checkWhitelist', async function (ctx, next) {
+    const address = ctx.query.address
+    const result = await checkWhitelist(address)
+    if (result) {
+        ctx.body = new SuccessModel()
+    } else {
+        ctx.body = new ErrorModel('not in whitelist')
+    }
+
+})
 
 router.get('/nonce', async function (ctx, next) {
     const address = ctx.query.address

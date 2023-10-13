@@ -104,7 +104,7 @@ async function checkSign(signReq) {
 async function checkJwtToken(token) {
     try {
         const jwt = jsonwebtoken.verify(token, SECRET_KEY); // 如果过期将返回false
-        console.info('jwt verify -->', jwt)
+        // console.info('jwt verify -->', jwt)
         const address = jwt.address
         return {success:true, address:address}
     } catch (e) {

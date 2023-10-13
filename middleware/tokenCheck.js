@@ -4,7 +4,7 @@ const { checkJwtToken } = require('../controller/user')
 module.exports = async (ctx, next) => {
     const { authorization = '' } = ctx.request.header;
     const token = authorization.replace('Bearer ', '');
-    console.info('authorization ----->' , authorization)
+    // console.info('authorization ----->' , authorization)
     const { success, address } = await checkJwtToken(token);
     if (success) {
         // 设置 session

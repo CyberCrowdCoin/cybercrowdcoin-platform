@@ -17,6 +17,8 @@ const {
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 const { ProtocolStatusEnum } = require('../model/enum')
 const tokenCheck = require('../middleware/tokenCheck')
+const checkWhitelist = require('../middleware/whitelistCheck')
+
 router.prefix('/ccc/protocol')
 
 
@@ -25,7 +27,7 @@ router.get('/list-by-demand', async function (ctx, next) {
     ctx.body = new SuccessModel(listData)
 })
 
-router.get('/candidate-protocol-list', tokenCheck, async function (ctx, next) {
+router.get('/candidate-protocol-list', tokenCheck, checkWhitelist, async function (ctx, next) {
     if (ctx.session.username == null) {
         console.error('is admin, but no login')
         // 未登录
@@ -44,7 +46,7 @@ router.get('/detail', async function (ctx, next) {
     ctx.body = new SuccessModel(data)
 })
 
-router.post('/invite-candidate', tokenCheck, async function (ctx, next) {
+router.post('/invite-candidate', tokenCheck, checkWhitelist, async function (ctx, next) {
     const body = ctx.request.body
     body.employer = ctx.session.username
     const data = await sendInvitation(body)
@@ -56,7 +58,7 @@ router.post('/invite-candidate', tokenCheck, async function (ctx, next) {
 
 })
 
-router.post('/send_proposal', tokenCheck, async function (ctx, next) {
+router.post('/send_proposal', tokenCheck, checkWhitelist, async function (ctx, next) {
     const body = ctx.request.body
     body.candidate = ctx.session.username
     const data = await sendProposal(body)
@@ -69,7 +71,7 @@ router.post('/send_proposal', tokenCheck, async function (ctx, next) {
 
 })
 
-router.post('/accept-invitation', tokenCheck, async function (ctx, next) {
+router.post('/accept-invitation', tokenCheck, checkWhitelist, async function (ctx, next) {
     const candidateAddress = ctx.session.username;
     const protocolId = ctx.request.body.protocolId
     const val = await acceptInvitation(candidateAddress, protocolId)
@@ -81,7 +83,7 @@ router.post('/accept-invitation', tokenCheck, async function (ctx, next) {
 })
 
 // refuseInvitation
-router.post('/refuse-invitation', tokenCheck, async function (ctx, next) {
+router.post('/refuse-invitation', tokenCheck, checkWhitelist, async function (ctx, next) {
     const candidate = ctx.session.username;
     const protocolId = ctx.request.body.protocolId
     const val = await refuseInvitation(candidate, protocolId)
@@ -93,7 +95,7 @@ router.post('/refuse-invitation', tokenCheck, async function (ctx, next) {
 })
 
 // accept-proposal
-router.post('/accept-proposal', tokenCheck, async function (ctx, next) {
+router.post('/accept-proposal', tokenCheck, checkWhitelist, async function (ctx, next) {
     const employer = ctx.session.username;
     const protocolId = ctx.request.body.protocolId
     const val = await acceptProposal(employer, protocolId)
@@ -105,7 +107,7 @@ router.post('/accept-proposal', tokenCheck, async function (ctx, next) {
 })
 
 // refuseProposal
-router.post('/refuse-proposal', tokenCheck, async function (ctx, next) {
+router.post('/refuse-proposal', tokenCheck, checkWhitelist, async function (ctx, next) {
     const employer = ctx.session.username;
     const protocolId = ctx.request.body.protocolId
     const val = await refuseProposal(employer, protocolId)
@@ -117,7 +119,7 @@ router.post('/refuse-proposal', tokenCheck, async function (ctx, next) {
 })
 
 // cancel-invitation
-router.post('/cancel-invitation', tokenCheck, async function (ctx, next) {
+router.post('/cancel-invitation', tokenCheck, checkWhitelist, async function (ctx, next) {
     const employer = ctx.session.username;
     const protocolId = ctx.request.body.protocolId
     const val = await cancelInvitation(employer, protocolId)
@@ -128,7 +130,7 @@ router.post('/cancel-invitation', tokenCheck, async function (ctx, next) {
     }
 })
 
-router.post('/finish-protocol', tokenCheck, async function (ctx, next) {
+router.post('/finish-protocol', tokenCheck, checkWhitelist, async function (ctx, next) {
     const candidate = ctx.session.username;
     const protocolId = ctx.request.body.protocolId
     const val = await finishProtocol(candidate, protocolId)
