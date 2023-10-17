@@ -1,4 +1,7 @@
 const router = require('koa-router')()
+const {
+  
+} = require('../controller/contract')
 
 router.get('/', async (ctx, next) => {
   await ctx.render('index', {

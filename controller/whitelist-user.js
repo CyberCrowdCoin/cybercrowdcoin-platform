@@ -27,7 +27,7 @@ async function getList() {
 async function populateWhitelistCache() {
     try {
       whitelistCache = await getList();
-      console.log('Whitelist cache populated', whitelistCache);
+      // console.log('Whitelist cache populated', whitelistCache);
     } catch (error) {
       console.error('Error populating whitelist cache', error);
     }

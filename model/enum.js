@@ -19,6 +19,7 @@ const ProtocolStatusEnum = {
     PROPOSAL_PENDING : 'proposal pending',
     INVITE_PENDING : 'invite pending',
     ACTIVE : 'active',
+    ACTIVE_PENDING : 'active pending',
     FINISHED : 'finished',
     INVITE_CANCEL : 'invite cancel',
     PROPOSAL_REFUSED : 'proposal refused',

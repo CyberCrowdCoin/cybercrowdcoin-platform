@@ -6,11 +6,10 @@ const { ProtocolStatusEnum, ProtocolMessageTypeEnum, DemandStatusEnum } = requir
 const candidate = require('./candidate')
 const demand = require('./demand')
 const proposalMessage = require('./protocol-message')
-const { addCandidateContract } = require('./contract')
-async function getList(demandId, candidate) {
+async function getList(contract, candidate) {
     // 拼接查询条件
     const whereOpt = {}
-    if (demandId) whereOpt.demandId = demandId
+    if (contract) whereOpt.contract = contract
     if (candidate) whereOpt.candidate = candidate
 
     // 执行查询
@@ -40,9 +39,9 @@ async function getDetail(id) {
 
 // 登录账号为employer才能操作
 async function sendInvitation(protocolData = {}) {
-    const demandId = protocolData.demandId
+    const contract = protocolData.contract
     const candidateAddress = protocolData.candidate
-    const demandData = await demand.getDetail(demandId)
+    const demandData = await demand.getDetail(contract)
     const candidateData = await candidate.getDetail(candidateAddress)
     // 逻辑校验
     const checkResult = await newProtocolCheck(demandData, candidateData);
@@ -54,7 +53,7 @@ async function sendInvitation(protocolData = {}) {
     // const ipfsurl = await addProtocolToIpfs(demandData.contract, employer, candidateData.user);
     // console.info('sendInvitation ipfsurl---->', ipfsurl)    
     // 入protocol表
-    const id = await newProtocol(demandId, ProtocolStatusEnum.INVITE_PENDING, employer, candidateAddress)
+    const id = await newProtocol(contract, ProtocolStatusEnum.INVITE_PENDING, employer, candidateAddress)
     // 增加一个invitation类型消息
     await proposalMessage.newProtocolMessage(employer, id, ProtocolMessageTypeEnum.INVITATION_SEND, '')
     return {
@@ -65,9 +64,9 @@ async function sendInvitation(protocolData = {}) {
 // 登录账号为candidate操作
 // 创建demand protocol表数据 -> 增加一个proposal类型消息并更新demand protocl 表 proposal-message-id
 async function sendProposal(protocolData = {}) {
-    const demandId = protocolData.demandId
+    const contract = protocolData.contract
     const candidateAddress = protocolData.candidate
-    const demandData = await demand.getDetail(demandId)
+    const demandData = await demand.getDetail(contract)
     const candidateData = await candidate.getDetail(candidateAddress)
     const checkResult = await newProtocolCheck(demandData, candidateData);
     if (!checkResult) {
@@ -75,7 +74,7 @@ async function sendProposal(protocolData = {}) {
     }
     const employer = demandData.creator
     // 入protocol表
-    const id = await newProtocol(demandId, ProtocolStatusEnum.PROPOSAL_PENDING, employer, candidateAddress)
+    const id = await newProtocol(contract, ProtocolStatusEnum.PROPOSAL_PENDING, employer, candidateAddress)
     // 增加一个proposal类型消息
     await proposalMessage.newProtocolMessage(candidateAddress, id, ProtocolMessageTypeEnum.PROPOSAL_SEND, '')
     return {
@@ -91,13 +90,14 @@ async function newProtocolCheck(demandData, candidateData) {
         return false
     }
     // 当前demand下没有有效的protocol数据
-    const protocols = await getList(demandData.id, null)
+    const protocols = await getList(demandData.contract, null)
     if (protocols) {
         for (const protocol of protocols) {
             if (protocol.status == ProtocolStatusEnum.ACTIVE ||
                 protocol.status == ProtocolStatusEnum.FINISHED ||
                 protocol.status == ProtocolStatusEnum.INVITE_PENDING ||
-                protocol.status == ProtocolStatusEnum.PROPOSAL_PENDING) {
+                protocol.status == ProtocolStatusEnum.PROPOSAL_PENDING || 
+                protocol.status == ProtocolStatusEnum.ACTIVE_PENDING) {
                 return false;
             }
         }
@@ -112,11 +112,11 @@ async function addProtocolToIpfs(contract, employer, candidate) {
     return ipfsurl
 }
 
-async function newProtocol(demandId, status, employer, candidate) {
+async function newProtocol(contract, status, employer, candidate) {
     const activeDate = null
     // 入protocol表
     const res = await Protocol.create({
-        demandId,
+        contract,
         status,
         employer,
         candidate,
@@ -171,7 +171,7 @@ async function refuseInvitation(candidateAddress, protocolId) {
 
 // accept-proposal(接收candidate发起的提议)
 // demand protocol信息存入ipfs 
-// -> 调用demand合约add-candidate 上链  
+// -> 调用demand合约add-candidate 改为前端调用
 // -> 增加一个accept-proposal类型message 
 // -> 更新demand protocl 表  如status=active,candidate,active_date
 async function acceptProposal(employer, protocolId) {
@@ -184,22 +184,23 @@ async function acceptProposal(employer, protocolId) {
         console.error('acceptProposal failed, protocol is not right', employer, protocolId)
         return false
     }
-    const demandData = await demand.getDetail(protocolData.demandId)
+    const demandData = await demand.getDetail(protocolData.contract)
     const candidateData = await candidate.getDetail(protocolData.candidate)
     try {
         // 上传IPFS
         const ipfsurl = await addProtocolToIpfs(demandData.contract, employer, candidateData.user)
+        return {url : ipfsurl}
         // 上链 ToDo
-        await addCandidateContract(demandData.contract, employer, candidateData.user, ipfsurl);
-        // 更新protocol表
-        await updateProtocolActive(protocolId)
-        // 发送accept-proposal消息 todo
-        await proposalMessage.newProtocolMessage(employer, protocolId, ProtocolMessageTypeEnum.PROPOSAL_ACCETP, '')
-        return true
+        // await addCandidateContract(demandData.contract, employer, candidateData.user, ipfsurl);
+        // // 更新protocol表
+        // await updateProtocolActive(protocolId)
+        // // 发送accept-proposal消息 todo
+        // await proposalMessage.newProtocolMessage(employer, protocolId, ProtocolMessageTypeEnum.PROPOSAL_ACCETP, '')
+        // return true
     } catch (error) {
         console.error("accept proposal error", error)
     }
-    return false;
+    return null;
 }
 
 // 登录用户为employer才能操作
@@ -317,4 +318,6 @@ module.exports = {
     refuseProposal,
     finishProtocol,
     cancelInvitation,
+    updateProtocolActive,
+    updateProtocolStatus,
 }

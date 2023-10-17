@@ -6,7 +6,7 @@ const { SuccessModel, ErrorModel } = require('../model/resModel')
 router.prefix('/ccc/user')
 
 router.get('/checkWhitelist', async function (ctx, next) {
-    const address = ctx.query.address
+    const address = ctx.session.username
     const result = await checkWhitelist(address)
     if (result) {
         ctx.body = new SuccessModel()
@@ -35,7 +35,6 @@ router.post('/sign-check', async function (ctx, next) {
         ctx.body = new ErrorModel('sign check error')
 
     }
-    
 })
 
 module.exports = router

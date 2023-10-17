@@ -1,80 +1,75 @@
 const { Web3 } = require('web3');
+const { ethers } = require('ethers');
 const CCCWeb = require('../contract/build/CCCWeb.json');
 const { CCCWB_CONTRACT_CONF, CCC_CONTRACT_CONF } = require('../conf/config')
 // 在模块顶部初始化合约对象
 const web3 = new Web3(new Web3.providers.WebsocketProvider(CCCWB_CONTRACT_CONF.websocketurl));
 const cccWebAddress = CCCWB_CONTRACT_CONF.address;
-const gas = CCCWB_CONTRACT_CONF.gas;
 const contract = new web3.eth.Contract(CCCWeb.abi, cccWebAddress);
+const { updateDemandStatus, getDetail, addDemand } = require('./demand')
+const protocol = require('./protocol')
+const { DemandStatusEnum, ProtocolStatusEnum, ProtocolMessageTypeEnum } = require('../model/enum')
+const proposalMessage = require('./protocol-message')
 
-async function endDemandContract(demandAddress, creator, tokenAmount) {
-    const tokenValue = getTokenValue(tokenAmount);
-    // 交易选项
-    const txOpts = {
-        from: creator, // 替换成你的以太坊地址
-        gas: gas, // 设置合适的 gas 限制
-    };
-    console.info("endDemand", demandAddress, creator, tokenValue);
+contract.events.allEvents({
+    fromBlock: 0,
+    toBlock: 'latest'
+}, function (error, event) { })
+    .on('data', async function (event) {
+        console.info("contract event==", event)
+        if (event.event === 'DemandCreated') {
+            await handleDemandCreated(event.returnValues);
+        }else if(event.event === 'DemandEnded') {
+            await handleDemandEnded(event.returnValues.demand);
+        }else if(event.event === 'CandidateAdded') {
+            await handleCandidateAdded(event.returnValues.protocolId);
+        }
 
-    await contract.methods.endDemand(demandAddress, creator, tokenValue)
-        .send(txOpts)
-        .on('transactionHash', (hash) => {
-            console.log('endDemand Transaction Hash:', hash);
-        })
-        .on('receipt', (receipt) => {
-            console.log('endDemand Transaction Receipt:', receipt);
-        })
-        .on('error', (error) => {
-            console.error('endDemand Transaction Error:', error);
-        });
+    })
+
+async function handleCandidateAdded(protocolId){
+    const protocolData = await protocol.getDetail(protocolId);
+    if(protocolData && protocolData.status === ProtocolStatusEnum.PROPOSAL_PENDING){
+        await protocol.updateProtocolActive(protocolId);
+        await proposalMessage.newProtocolMessage(protocolData.employer, protocolId, ProtocolMessageTypeEnum.PROPOSAL_ACCETP, '')
+    }
 }
 
-async function addCandidateContract(demandAddress, creator, candidate, ipfsUrl) {
-    // 交易选项
-    const txOpts = {
-        from: creator, // 替换成你的以太坊地址
-        gas: gas, // 设置合适的 gas 限制
-    };
-    
-    const ipfsUrlBytes = web3.utils.asciiToHex(ipfsUrl);
-    console.info("addCandidate", demandAddress, creator, candidate, ipfsUrlBytes);
-    await contract.methods.addCandidate(demandAddress, candidate, ipfsUrlBytes)
-        .send(txOpts)
-        .on('transactionHash', (hash) => {
-            console.log('addCandidate Transaction Hash:', hash);
-        })
-        .on('receipt', (receipt) => {
-            console.log('addCandidate Transaction Receipt:', receipt);
-        })
-        .on('error', (error) => {
-            console.error('addCandidate Transaction Error:', error);
-        });
+async function handleDemandEnded(contract){
+    const demand = await getDetail(contract);
+    if(demand && DemandStatusEnum.COMPLETED !== demand.status){
+        await updateDemandStatus(contract, DemandStatusEnum.COMPLETED);
+    }
 }
 
-// async function createDemandContract(creator, tokenAmount, ipfsUrl) {
-//     const tokenValue = getTokenValue(tokenAmount);
-//     const ipfsUrlBytes = web3.utils.asciiToHex(ipfsUrl); // 转换为以太坊可识别的字节数组
-//     // 交易选项
-//     const txOpts = {
-//         from: creator, // 替换成你的以太坊地址
-//         gas: gas, // 设置合适的 gas 限制
-//     };
-//     // 调用智能合约函数
-//     console.info("createDemand", creator, tokenValue, ipfsUrlBytes);
-//     let returnValue;
-//     await contract.methods.createDemand(creator, tokenValue, ipfsUrlBytes)
-//         .send(txOpts)
-//         .on('receipt', function (receipt) {
-//             console.log('Transaction Receipt:', receipt);
-//             // 从 receipt 中获取智能合约函数的返回值
-//             // const returnValue = receipt.events;
-//             // console.log("returnValue---------> ", returnValue);
-//         })
-//         .on('error', (error) => {
-//             console.error('Transaction Error:', error);
-//         });
-//     return returnValue;
-// }
+async function handleDemandCreated(returnValues) {
+    // 根据contract查找记录
+    const contract = returnValues.newDemand;
+    const ipfsData = returnValues.ipfsData;
+    const creator = returnValues.creator;
+    const demandData = await getDetail(contract);
+    if (contract && demandData === null) {
+        // 插入
+        console.log("step here")
+        try {
+            // 使用 ethers.utils.hexDataSlice 将字节字符串还原为字节数组
+            const demandBytesArray = ethers.utils.arrayify(ipfsData);
+
+            // 使用 Buffer.from 将字节数组转换为 JSON 字符串
+            const jsonString = Buffer.from(demandBytesArray).toString('utf8');
+
+            // 使用 JSON.parse 将 JSON 字符串解析为对象
+            const demand = JSON.parse(jsonString);
+            demand.creator = creator;
+            demand.contract = contract;
+            // console.info("demandJson=    ", demand)
+            await addDemand(demand);
+        } catch (error) {
+            console.error(error)
+        }
+    }
+}
+
 
 function getTokenValue(tokenAmount) {
     const tokenValue = {
@@ -90,5 +85,4 @@ function getTokenValue(tokenAmount) {
 }
 
 module.exports = {
-    endDemandContract,addCandidateContract,contract
 }

@@ -2,12 +2,10 @@ const router = require('koa-router')()
 const {
     getList,
     getDetail,
-    newDemand,
-    endDemand,
-    addDemandToIpfs
+    addDemandToIpfs,
+    endDemandCheck
 } = require('../controller/demand')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
-const { DemandStatusEnum } = require('../model/enum')
 const tokenCheck = require('../middleware/tokenCheck')
 const checkWhitelist = require('../middleware/whitelistCheck')
 
@@ -38,7 +36,7 @@ router.get('/employer-demand-list', tokenCheck, checkWhitelist, async function (
 
 
 router.get('/detail', async function (ctx, next) {
-    const data = await getDetail(ctx.query.id);
+    const data = await getDetail(ctx.query.contract);
     ctx.body = new SuccessModel(data)
 })
 
@@ -50,14 +48,14 @@ router.post('/add-ipfs', tokenCheck, checkWhitelist, async function (ctx, next) 
 
 })
 
-router.post('/end', tokenCheck, checkWhitelist, async function (ctx, next) {
+router.get('/endDemandCheck', tokenCheck, checkWhitelist, async function (ctx, next) {
     const creator = ctx.session.username
-    const id = ctx.request.body.id
-    const val = await endDemand(id, creator)
+    const contract = ctx.query.contract
+    const val = await endDemandCheck(contract, creator)
     if (val) {
         ctx.body = new SuccessModel()
     } else {
-        ctx.body = new ErrorModel('end demand failed')
+        ctx.body = new ErrorModel('end demand check failed')
     }
 })
 

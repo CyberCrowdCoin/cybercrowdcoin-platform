@@ -2,46 +2,8 @@ const Sequelize = require('sequelize')
 const xss = require('xss')
 const Demand = require('../db/mysql/model/Demand')
 const Protocol = require('../db/mysql/model/Protocol')
-const { addToIpfs, getFromIpfs } = require('../db/ipfs/ipfs')
+const { addToIpfs } = require('../db/ipfs/ipfs')
 const { DemandStatusEnum, ProtocolStatusEnum } = require('../model/enum')
-const { endDemandContract } = require('./contract')
-const contract = require('./contract'); // 导入合约对象
-const ethers = require('ethers');
-
-
-
-contract.contract.events.DemandCreated({
-    fromBlock: 0,
-    toBlock: 'latest'
-}, function (error, event) { })
-    .on('data', async function (event) {
-        // 根据contract查找记录
-        const contract = event.returnValues.newDemand;
-        const ipfsData = event.returnValues.ipfsData;
-        const creator = event.returnValues.creator;
-        const demandData = await getByContract(contract);
-        console.info("DemandCreated demandData ", contract, demandData)
-        if (contract && demandData === null) {
-            // 插入
-            console.log("step here")
-            try {
-                // 使用 ethers.utils.hexDataSlice 将字节字符串还原为字节数组
-                const demandBytesArray = ethers.utils.arrayify(ipfsData);
-
-                // 使用 Buffer.from 将字节数组转换为 JSON 字符串
-                const jsonString = Buffer.from(demandBytesArray).toString('utf8');
-
-                // 使用 JSON.parse 将 JSON 字符串解析为对象
-                const demand = JSON.parse(jsonString);
-                demand.creator = creator;
-                demand.contract = contract;
-                // console.info("demandJson=    ", demand)
-                newDemand(demand);
-            } catch (error) {
-                console.error(error)
-            }
-        }
-    })
 
 async function getList(creator = '', title = '', status = '', category = '') {
     // 拼接查询条件
@@ -63,22 +25,7 @@ async function getList(creator = '', title = '', status = '', category = '') {
     return list.map(item => item.dataValues)
 }
 
-async function getDetail(id) {
-    const demand = await Demand.findOne({
-        where: {
-            id,
-        }
-    })
-    if (demand !== null) {
-        // 找到了数据
-        return demand.dataValues;
-    } else {
-        // 没有找到数据
-        return null;
-    }
-}
-
-async function getByContract(contract) {
+async function getDetail(contract) {
     const demand = await Demand.findOne({
         where: {
             contract,
@@ -114,7 +61,7 @@ async function addDemandToIpfs(demandData = {}) {
     }
 }
 
-function newDemand(demandData = {}) {
+async function addDemand(demandData = {}) {
     const title = demandData.title
     const creator = demandData.creator
     const category = demandData.category
@@ -143,13 +90,13 @@ function newDemand(demandData = {}) {
 
 }
 
-async function endDemand(id, creator = '') {
-    const demandData = await getDetail(id)
+async function endDemandCheck(contract = '', creator = ''){
+    const demandData = await getDetail(contract)
     if (demandData == null || creator != demandData.creator || DemandStatusEnum.OPEN != demandData.status) {
         return false
     }
     // check demand下 无进行中的protocol
-    const protocolList = await getProtocolList(id, null)
+    const protocolList = await getProtocolList(contract, null)
     if (protocolList) {
         for (const protocol of protocolList) {
             if (protocol.status == ProtocolStatusEnum.ACTIVE ||
@@ -158,18 +105,36 @@ async function endDemand(id, creator = '') {
                 return false;
         }
     }
-    // 调用合约end demand 退还押金
-    await endDemandContract(demandData.contract, creator, demandData.tokenAmount)
-    // 更新demand status
-    await updateDemandStatus(id, creator, DemandStatusEnum.COMPLETED)
-    return true
+    return true;
 }
 
-async function getProtocolList(demandId) {
+async function endDemand(id, creator = '') {
+    // const demandData = await getDetail(id)
+    // if (demandData == null || creator != demandData.creator || DemandStatusEnum.OPEN != demandData.status) {
+    //     return false
+    // }
+    // // check demand下 无进行中的protocol
+    // const protocolList = await getProtocolList(id, null)
+    // if (protocolList) {
+    //     for (const protocol of protocolList) {
+    //         if (protocol.status == ProtocolStatusEnum.ACTIVE ||
+    //             protocol.status == ProtocolStatusEnum.INVITE_PENDING ||
+    //             protocol.status == ProtocolStatusEnum.PROPOSAL_PENDING)
+    //             return false;
+    //     }
+    // }
+    // // 调用合约end demand 退还押金
+    // await endDemandContract(demandData.contract, creator, demandData.tokenAmount)
+    // // 更新demand status
+    // await updateDemandStatus(, DemandStatusEnum.COMPLETED)
+    // return true
+}
+
+async function getProtocolList(contract) {
 
     const protocols = await Protocol.findAll({
         where: {
-            demandId,
+            contract,
         }
     })
     return protocols
@@ -193,7 +158,7 @@ async function updateDemandContract(transHash, contract = '') {
     return false
 }
 
-async function updateDemandStatus(id, creator = '', status = '') {
+async function updateDemandStatus(contract = '', status = '') {
     const res = await Demand.update(
         // 要更新的内容
         {
@@ -202,8 +167,7 @@ async function updateDemandStatus(id, creator = '', status = '') {
         // 条件
         {
             where: {
-                id,
-                creator
+                contract
             }
         }
     )
@@ -216,9 +180,10 @@ async function updateDemandStatus(id, creator = '', status = '') {
 module.exports = {
     getList,
     getDetail,
-    newDemand,
+    addDemand,
     endDemand,
     updateDemandContract,
     updateDemandStatus,
     addDemandToIpfs,
+    endDemandCheck,
 }

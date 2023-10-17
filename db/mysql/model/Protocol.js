@@ -6,11 +6,11 @@ const Protocol = seq.define(
     {
         /* 不用定义 id ，seq 会自动增加 */
 
-        demandId: {
-            type: Sequelize.BIGINT,
+        contract: {
+            type: Sequelize.STRING,
             allowNUll: false,
-            field: 'demand_id',
-            comment: 'demand id'
+            field: 'contract',
+            comment: 'contract id'
         },
 
         status: {

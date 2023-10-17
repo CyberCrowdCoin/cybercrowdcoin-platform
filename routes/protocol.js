@@ -13,6 +13,7 @@ const {
     refuseProposal,
     finishProtocol,
     cancelInvitation,
+    updateProtocolStatus
 } = require('../controller/protocol')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 const { ProtocolStatusEnum } = require('../model/enum')
@@ -23,7 +24,7 @@ router.prefix('/ccc/protocol')
 
 
 router.get('/list-by-demand', async function (ctx, next) {
-    const listData = await getList(ctx.query.demandId, null)
+    const listData = await getList(ctx.query.contract, null)
     ctx.body = new SuccessModel(listData)
 })
 
@@ -98,9 +99,9 @@ router.post('/refuse-invitation', tokenCheck, checkWhitelist, async function (ct
 router.post('/accept-proposal', tokenCheck, checkWhitelist, async function (ctx, next) {
     const employer = ctx.session.username;
     const protocolId = ctx.request.body.protocolId
-    const val = await acceptProposal(employer, protocolId)
-    if (val) {
-        ctx.body = new SuccessModel()
+    const data = await acceptProposal(employer, protocolId)
+    if(data){
+        ctx.body = new SuccessModel(data)
     } else {
         ctx.body = new ErrorModel('accept proposal failed')
     }
@@ -138,6 +139,16 @@ router.post('/finish-protocol', tokenCheck, checkWhitelist, async function (ctx,
         ctx.body = new SuccessModel()
     } else {
         ctx.body = new ErrorModel('finish protocol failed')
+    }
+})
+
+router.post('/protocol-active-pending', tokenCheck, checkWhitelist, async function (ctx, next) {
+    const protocolId = ctx.request.body.protocolId
+    const val = await updateProtocolStatus(protocolId, ProtocolStatusEnum.ACTIVE_PENDING)
+    if (val) {
+        ctx.body = new SuccessModel()
+    } else {
+        ctx.body = new ErrorModel('protocol active pending failed')
     }
 })
 
