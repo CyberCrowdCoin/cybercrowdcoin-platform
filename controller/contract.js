@@ -10,13 +10,14 @@ const { updateDemandStatus, getDetail, addDemand } = require('./demand')
 const protocol = require('./protocol')
 const { DemandStatusEnum, ProtocolStatusEnum, ProtocolMessageTypeEnum } = require('../model/enum')
 const proposalMessage = require('./protocol-message')
+const logger = require('../conf/log')
 
 contract.events.allEvents({
     fromBlock: 0,
     toBlock: 'latest'
 }, function (error, event) { })
     .on('data', async function (event) {
-        console.info("contract event==", event)
+        logger.info("contract event==", event)
         if (event.event === 'DemandCreated') {
             await handleDemandCreated(event.returnValues);
         }else if(event.event === 'DemandEnded') {
