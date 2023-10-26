@@ -32,6 +32,7 @@ async function handleCandidateAdded(protocolId){
     const protocolData = await protocol.getDetail(protocolId);
     if(protocolData && protocolData.status === ProtocolStatusEnum.PROPOSAL_PENDING){
         await protocol.updateProtocolActive(protocolId);
+        await updateDemandStatus(protocolData.contract, DemandStatusEnum.ONGOING);
         await proposalMessage.newProtocolMessage(protocolData.employer, protocolId, ProtocolMessageTypeEnum.PROPOSAL_ACCETP, '')
     }
 }
@@ -51,7 +52,6 @@ async function handleDemandCreated(returnValues) {
     const demandData = await getDetail(contract);
     if (contract && demandData === null) {
         // 插入
-        console.log("step here")
         try {
             // 使用 ethers.utils.hexDataSlice 将字节字符串还原为字节数组
             const demandBytesArray = ethers.utils.arrayify(ipfsData);

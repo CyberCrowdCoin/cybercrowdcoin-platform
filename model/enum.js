@@ -2,6 +2,7 @@
 const DemandStatusEnum = {
     // open/completed
     OPEN : 'open',
+    ONGOING : 'ongoing',
     COMPLETED : 'completed'
 }
 

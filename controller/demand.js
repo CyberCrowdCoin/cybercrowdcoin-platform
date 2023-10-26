@@ -92,7 +92,7 @@ async function addDemand(demandData = {}) {
 
 async function endDemandCheck(contract = '', creator = ''){
     const demandData = await getDetail(contract)
-    if (demandData == null || creator != demandData.creator || DemandStatusEnum.OPEN != demandData.status) {
+    if (demandData == null || creator != demandData.creator || DemandStatusEnum.ONGOING != demandData.status) {
         return false
     }
     // check demand下 无进行中的protocol
@@ -108,27 +108,6 @@ async function endDemandCheck(contract = '', creator = ''){
     return true;
 }
 
-async function endDemand(id, creator = '') {
-    // const demandData = await getDetail(id)
-    // if (demandData == null || creator != demandData.creator || DemandStatusEnum.OPEN != demandData.status) {
-    //     return false
-    // }
-    // // check demand下 无进行中的protocol
-    // const protocolList = await getProtocolList(id, null)
-    // if (protocolList) {
-    //     for (const protocol of protocolList) {
-    //         if (protocol.status == ProtocolStatusEnum.ACTIVE ||
-    //             protocol.status == ProtocolStatusEnum.INVITE_PENDING ||
-    //             protocol.status == ProtocolStatusEnum.PROPOSAL_PENDING)
-    //             return false;
-    //     }
-    // }
-    // // 调用合约end demand 退还押金
-    // await endDemandContract(demandData.contract, creator, demandData.tokenAmount)
-    // // 更新demand status
-    // await updateDemandStatus(, DemandStatusEnum.COMPLETED)
-    // return true
-}
 
 async function getProtocolList(contract) {
 
@@ -181,7 +160,6 @@ module.exports = {
     getList,
     getDetail,
     addDemand,
-    endDemand,
     updateDemandContract,
     updateDemandStatus,
     addDemandToIpfs,
