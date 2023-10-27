@@ -17,9 +17,19 @@ const demand = require('./routes/demand')
 const candidate = require('./routes/candidate')
 const protocol = require('./routes/protocol')
 const protocolMessage = require('./routes/protocol-message')
+const cors = require('koa2-cors'); // 引入 koa2-cors 中间件
+
 
 // error handler
 onerror(app)
+
+// 使用 koa2-cors 中间件
+app.use(cors({
+  origin: '*', // 这里可以设置允许访问的域名，'*' 表示允许所有来源访问
+  credentials: true, // 如果需要发送身份验证凭证（如 cookies），可以将其设置为 true
+  methods: 'GET, POST, PUT, DELETE', // 允许的 HTTP 请求方法
+  headers: 'Content-Type, Authorization' // 允许的请求头
+}));
 
 // middlewares
 app.use(bodyparser({
