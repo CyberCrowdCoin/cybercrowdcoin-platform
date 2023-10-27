@@ -3,7 +3,8 @@ const {
     getList,
     getDetail,
     addDemandToIpfs,
-    endDemandCheck
+    endDemandCheck,
+    getPageList
 } = require('../controller/demand')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 const tokenCheck = require('../middleware/tokenCheck')
@@ -15,7 +16,10 @@ router.get('/all-list', async function (ctx, next) {
     const title = ctx.query.title || ''
     const status = ctx.query.status || ''
     const category = ctx.query.category || ''
-    const listData = await getList('', title, status, category)
+    const page =  parseInt(ctx.query.page || 1)
+    const pageSize = parseInt(ctx.query.pageSize || 10)
+    console.info("pageSize=", pageSize)
+    const listData = await getPageList('', title, status, category, page, pageSize)
     ctx.body = new SuccessModel(listData)
 })
 
@@ -30,7 +34,9 @@ router.get('/employer-demand-list', tokenCheck, checkWhitelist, async function (
     const title = ctx.query.title || ''
     const status = ctx.query.status || ''
     const contract = ctx.query.contract || ''
-    const listData = await getList(creator, title, status, contract)
+    const page = ctx.query.page || 1
+    const pageSize = ctx.query.pageSize || 10
+    const listData = await getPageList(creator, title, status, contract, page, pageSize)
     ctx.body = new SuccessModel(listData)
 })
 

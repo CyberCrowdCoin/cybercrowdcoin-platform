@@ -25,6 +25,38 @@ async function getList(creator = '', title = '', status = '', category = '') {
     return list.map(item => item.dataValues)
 }
 
+async function getPageList(creator = '', title = '', status = '', category = '', page = 1, pageSize = 10) {
+    // 拼接查询条件
+    const whereOpt = {}
+    if (category) whereOpt.category = category
+    if (creator) whereOpt.creator = creator
+    if (status) whereOpt.status = status
+    if (title) whereOpt.title = {
+        [Sequelize.Op.like]: `%${title}%` // 模糊查询
+    }
+
+    console.info("pageSize=", pageSize)
+    // 计算偏移量
+    const offset = (page - 1) * pageSize;
+
+    // 执行分页查询
+    const result = await Demand.findAndCountAll({
+        where: whereOpt,
+        order: [['id', 'desc']], // 排序
+        offset: offset, // 偏移量
+        limit: pageSize // 每页数量
+    });
+
+    const list = result.rows.map(item => item.dataValues);
+    const totalItems = result.count;
+
+    return {
+        list: list,
+        total: totalItems
+    };
+}
+
+
 async function getDetail(contract) {
     const demand = await Demand.findOne({
         where: {
@@ -164,4 +196,5 @@ module.exports = {
     updateDemandStatus,
     addDemandToIpfs,
     endDemandCheck,
+    getPageList,
 }

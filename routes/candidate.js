@@ -6,6 +6,7 @@ const {
     addSkills,
     deleteSkill,
     getSkillListByCandidate,
+    getPageList
 } = require('../controller/candidate')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 const { CandidateStatusEnum } = require('../model/enum')
@@ -16,7 +17,9 @@ const checkWhitelist = require('../middleware/whitelistCheck')
 router.prefix('/ccc/candidate')
 
 router.get('/all-list', async function (ctx, next) {
-    const listData = await getList()
+    const page =  parseInt(ctx.query.page || 1)
+    const pageSize = parseInt(ctx.query.pageSize || 10);
+    const listData = await getPageList(page, pageSize)
     ctx.body = new SuccessModel(listData)
 })
 
