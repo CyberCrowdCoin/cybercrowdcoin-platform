@@ -32,7 +32,7 @@ router.get('/candidate-protocol-list', tokenCheck, checkWhitelist, async functio
     if (ctx.session.username == null) {
         console.error('is admin, but no login')
         // 未登录
-        ctx.body = new ErrorModel('未登录')
+        ctx.body = new ErrorModel('no login')
         return
     }
     const candidate =  ctx.session.username
@@ -50,25 +50,17 @@ router.get('/detail', async function (ctx, next) {
 router.post('/invite-candidate', tokenCheck, checkWhitelist, async function (ctx, next) {
     const body = ctx.request.body
     body.employer = ctx.session.username
-    const data = await sendInvitation(body)
-    if(data){
-        ctx.body = new SuccessModel(data)
-    } else {
-        ctx.body = new ErrorModel('invite candidate failed')
-    }
+    const result = await sendInvitation(body)
+    ctx.body = result
 
 })
 
 router.post('/send_proposal', tokenCheck, checkWhitelist, async function (ctx, next) {
     const body = ctx.request.body
     body.candidate = ctx.session.username
-    const data = await sendProposal(body)
-    if(data){
-        ctx.body = new SuccessModel(data)
-    } else {
-        ctx.body = new ErrorModel('send proposal failed')
-    }
-    
+    const result = await sendProposal(body)
+    ctx.body = result
+
 
 })
 
@@ -76,11 +68,7 @@ router.post('/accept-invitation', tokenCheck, checkWhitelist, async function (ct
     const candidateAddress = ctx.session.username;
     const protocolId = ctx.request.body.protocolId
     const val = await acceptInvitation(candidateAddress, protocolId)
-    if (val) {
-        ctx.body = new SuccessModel()
-    } else {
-        ctx.body = new ErrorModel('accept invitation failed')
-    }
+    ctx.body = val
 })
 
 // refuseInvitation
@@ -88,11 +76,7 @@ router.post('/refuse-invitation', tokenCheck, checkWhitelist, async function (ct
     const candidate = ctx.session.username;
     const protocolId = ctx.request.body.protocolId
     const val = await refuseInvitation(candidate, protocolId)
-    if (val) {
-        ctx.body = new SuccessModel()
-    } else {
-        ctx.body = new ErrorModel('refuse invitation failed')
-    }
+    ctx.body = val;
 })
 
 // accept-proposal
@@ -100,11 +84,7 @@ router.post('/accept-proposal', tokenCheck, checkWhitelist, async function (ctx,
     const employer = ctx.session.username;
     const protocolId = ctx.request.body.protocolId
     const data = await acceptProposal(employer, protocolId)
-    if(data){
-        ctx.body = new SuccessModel(data)
-    } else {
-        ctx.body = new ErrorModel('accept proposal failed')
-    }
+    ctx.body = data
 })
 
 // refuseProposal
@@ -112,11 +92,7 @@ router.post('/refuse-proposal', tokenCheck, checkWhitelist, async function (ctx,
     const employer = ctx.session.username;
     const protocolId = ctx.request.body.protocolId
     const val = await refuseProposal(employer, protocolId)
-    if (val) {
-        ctx.body = new SuccessModel()
-    } else {
-        ctx.body = new ErrorModel('refuse proposal failed')
-    }
+    ctx.body = val
 })
 
 // cancel-invitation
@@ -124,22 +100,14 @@ router.post('/cancel-invitation', tokenCheck, checkWhitelist, async function (ct
     const employer = ctx.session.username;
     const protocolId = ctx.request.body.protocolId
     const val = await cancelInvitation(employer, protocolId)
-    if (val) {
-        ctx.body = new SuccessModel()
-    } else {
-        ctx.body = new ErrorModel('cancel invitation failed')
-    }
+    ctx.body = val
 })
 
 router.post('/finish-protocol', tokenCheck, checkWhitelist, async function (ctx, next) {
     const candidate = ctx.session.username;
     const protocolId = ctx.request.body.protocolId
     const val = await finishProtocol(candidate, protocolId)
-    if (val) {
-        ctx.body = new SuccessModel()
-    } else {
-        ctx.body = new ErrorModel('finish protocol failed')
-    }
+    ctx.body = val
 })
 
 router.post('/protocol-active-pending', tokenCheck, checkWhitelist, async function (ctx, next) {

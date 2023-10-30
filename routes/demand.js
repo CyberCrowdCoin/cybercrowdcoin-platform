@@ -58,11 +58,7 @@ router.get('/endDemandCheck', tokenCheck, checkWhitelist, async function (ctx, n
     const creator = ctx.session.username
     const contract = ctx.query.contract
     const val = await endDemandCheck(contract, creator)
-    if (val) {
-        ctx.body = new SuccessModel()
-    } else {
-        ctx.body = new ErrorModel('end demand check failed')
-    }
+    ctx.body = val
 })
 
 

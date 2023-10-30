@@ -4,6 +4,8 @@ const Demand = require('../db/mysql/model/Demand')
 const Protocol = require('../db/mysql/model/Protocol')
 const { addToIpfs } = require('../db/ipfs/ipfs')
 const { DemandStatusEnum, ProtocolStatusEnum } = require('../model/enum')
+const { SuccessModel, ErrorModel } = require('../model/resModel')
+
 
 async function getList(creator = '', title = '', status = '', category = '') {
     // 拼接查询条件
@@ -125,7 +127,7 @@ async function addDemand(demandData = {}) {
 async function endDemandCheck(contract = '', creator = ''){
     const demandData = await getDetail(contract)
     if (demandData == null || creator != demandData.creator || DemandStatusEnum.ONGOING != demandData.status) {
-        return false
+        return new ErrorModel('demand data is null or status is not ongoing');
     }
     // check demand下 无进行中的protocol
     const protocolList = await getProtocolList(contract, null)
@@ -134,10 +136,10 @@ async function endDemandCheck(contract = '', creator = ''){
             if (protocol.status == ProtocolStatusEnum.ACTIVE ||
                 protocol.status == ProtocolStatusEnum.INVITE_PENDING ||
                 protocol.status == ProtocolStatusEnum.PROPOSAL_PENDING)
-                return false;
+                return new ErrorModel('demand has active or pending protocol');
         }
     }
-    return true;
+    return new SuccessModel('end demand success');
 }
 
 
