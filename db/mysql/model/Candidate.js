@@ -34,6 +34,10 @@ const Candidate = seq.define(
             type: Sequelize.STRING,
             allowNUll: false
         },
+        description: {
+            type: Sequelize.TEXT, // TEXT 可存储大文件
+            allowNUll: false
+        },
 
         /* 不用定义 createTime ，seq 会自动增加 createdAt 和 updatedAt */
     }

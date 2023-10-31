@@ -30,13 +30,31 @@ async function getPageList(page = 1, pageSize = 10) {
     // 执行分页查询
     const result = await Candidate.findAndCountAll({
         where: whereOpt,
-        order: [['id', 'desc']], // 排序
-        offset: offset, // 偏移量
-        limit: pageSize // 每页数量
+        order: [['id', 'desc']],
+        offset: offset,
+        limit: pageSize
     });
-
-    const list = result.rows.map(item => item.dataValues);
-    const totalItems = result.count;
+    let list = [];
+    let totalItems = 0
+    if (result) {
+        list = result.rows.map(item => item.dataValues);
+        // 循环集合并调用接口
+        for (let i = 0; i < list.length; i++) {
+            const entity = list[i];
+    
+            // 调用接口并获取接口返回值
+            const skills = await getSkillListByCandidate(entity.user); // 以某个字段的值作为参数
+            if (skills) {
+                // 使用 map 函数提取 skill 字段的值
+                const skillList = skills.map(skillEntity => skillEntity.skill);
+            
+                // 将提取的 skill 字段值赋给 entity 的某个字段
+                entity.skills = skillList;
+            }
+        }
+        totalItems = result.count;
+    } 
+    
     return {
         list: list,
         total: totalItems
@@ -59,6 +77,7 @@ async function newCandidate(candidateData = {}) {
     const gender = xss(candidateData.gender)
     const age = xss(candidateData.age)
     const phone = xss(candidateData.phone)
+    const description = xss(candidateData.description)
     const status = CandidateStatusEnum.VALID
 
     const [candidate, created] = await Candidate.upsert({
@@ -68,6 +87,7 @@ async function newCandidate(candidateData = {}) {
         gender,
         age,
         phone,
+        description
     }, { where: { user } });
 
     return {
