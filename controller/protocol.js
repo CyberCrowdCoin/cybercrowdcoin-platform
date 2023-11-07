@@ -24,6 +24,33 @@ async function getList(contract, candidate) {
     return list.map(item => item.dataValues)
 }
 
+async function getPageList(contract = '', candidate = '', page = 1, pageSize = 10) {
+    // 拼接查询条件
+    // 拼接查询条件
+    const whereOpt = {}
+    if (contract) whereOpt.contract = contract
+    if (candidate) whereOpt.candidate = candidate
+
+    // 计算偏移量
+    const offset = (page - 1) * pageSize;
+
+    // 执行分页查询
+    const result = await Protocol.findAndCountAll({
+        where: whereOpt,
+        order: [['id', 'desc']], // 排序
+        offset: offset, // 偏移量
+        limit: pageSize // 每页数量
+    });
+
+    const list = result.rows.map(item => item.dataValues);
+    const totalItems = result.count;
+
+    return {
+        list: list,
+        total: totalItems
+    };
+}
+
 async function getDetail(id) {
     const protocol = await Protocol.findOne({
         where: {
@@ -319,4 +346,5 @@ module.exports = {
     cancelInvitation,
     updateProtocolActive,
     updateProtocolStatus,
+    getPageList
 }

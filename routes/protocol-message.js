@@ -8,7 +8,9 @@ router.prefix('/ccc/protocol-message')
 
 
 router.get('/list-by-protocol', async function (ctx, next) {
-    const listData = await getListByProtocolId(ctx.query.protocolId)
+    const page =  parseInt(ctx.query.page || 1)
+    const pageSize = parseInt(ctx.query.pageSize || 10)
+    const listData = await getListByProtocolId(ctx.query.protocolId, page, pageSize)
     ctx.body = new SuccessModel(listData)
 })
 

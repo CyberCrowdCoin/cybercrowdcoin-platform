@@ -3,18 +3,28 @@ const xss = require('xss')
 const ProtocolMessage = require('../db/mysql/model/ProtocolMessage')
 
 
-async function getListByProtocolId(protocolId) {
-    // 拼接查询条件
-    const whereOpt = {}
-    if (protocolId) whereOpt.protocolId = protocolId
-    // 执行查询
-    const list = await ProtocolMessage.findAll({
+async function getListByProtocolId(protocolId, page = 1, pageSize = 10) {
+   // 拼接查询条件
+   const whereOpt = {}
+   if (protocolId) whereOpt.protocolId = protocolId
+
+    // 计算偏移量
+    const offset = (page - 1) * pageSize;
+
+    // 执行分页查询
+    const result = await ProtocolMessage.findAndCountAll({
         where: whereOpt,
-        order: [
-            ['id', 'desc'] // 排序
-        ]
-    })
-    return list.map(item => item.dataValues)
+        order: [['id', 'desc']], // 排序
+        offset: offset, // 偏移量
+        limit: pageSize // 每页数量
+    });
+
+    const list = result.rows.map(item => item.dataValues);
+    const totalItems = result.count;
+    return {
+        list: list,
+        total: totalItems
+    };
 }
 
 async function getDetail(id) {

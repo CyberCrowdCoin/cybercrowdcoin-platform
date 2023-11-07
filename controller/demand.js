@@ -139,7 +139,7 @@ async function endDemandCheck(contract = '', creator = ''){
                 return new ErrorModel('demand has active or pending protocol');
         }
     }
-    return new SuccessModel('end demand success');
+    return new SuccessModel();
 }
 
 

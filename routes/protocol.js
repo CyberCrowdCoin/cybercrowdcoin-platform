@@ -13,7 +13,8 @@ const {
     refuseProposal,
     finishProtocol,
     cancelInvitation,
-    updateProtocolStatus
+    updateProtocolStatus,
+    getPageList
 } = require('../controller/protocol')
 const { SuccessModel, ErrorModel } = require('../model/resModel')
 const { ProtocolStatusEnum } = require('../model/enum')
@@ -24,7 +25,9 @@ router.prefix('/ccc/protocol')
 
 
 router.get('/list-by-demand', async function (ctx, next) {
-    const listData = await getList(ctx.query.contract, null)
+    const page =  parseInt(ctx.query.page || 1)
+    const pageSize = parseInt(ctx.query.pageSize || 10)
+    const listData = await getPageList(ctx.query.contract, null, page, pageSize)
     ctx.body = new SuccessModel(listData)
 })
 
@@ -35,9 +38,11 @@ router.get('/candidate-protocol-list', tokenCheck, checkWhitelist, async functio
         ctx.body = new ErrorModel('no login')
         return
     }
+    const page =  parseInt(ctx.query.page || 1)
+    const pageSize = parseInt(ctx.query.pageSize || 10)
     const candidate =  ctx.session.username
     
-    const listData = await getList(null, candidate)
+    const listData = await getPageList(null, candidate, page, pageSize)
     ctx.body = new SuccessModel(listData)
 })
 
