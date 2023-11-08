@@ -17,6 +17,7 @@ const demand = require('./routes/demand')
 const candidate = require('./routes/candidate')
 const protocol = require('./routes/protocol')
 const protocolMessage = require('./routes/protocol-message')
+const data = require('./routes/data')
 const cors = require('koa2-cors'); // 引入 koa2-cors 中间件
 
 
@@ -86,6 +87,7 @@ app.use(demand.routes(), demand.allowedMethods())
 app.use(candidate.routes(), candidate.allowedMethods())
 app.use(protocol.routes(), protocol.allowedMethods())
 app.use(protocolMessage.routes(), protocolMessage.allowedMethods())
+app.use(data.routes(), data.allowedMethods())
 
 
 // error-handling

@@ -17,15 +17,19 @@ contract.events.allEvents({
     toBlock: 'latest'
 }, function (error, event) { })
     .on('data', async function (event) {
-        logger.info("contract event==", event)
-        if (event.event === 'DemandCreated') {
-            await handleDemandCreated(event.returnValues);
-        }else if(event.event === 'DemandEnded') {
-            await handleDemandEnded(event.returnValues.demand);
-        }else if(event.event === 'CandidateAdded') {
-            await handleCandidateAdded(event.returnValues.protocolId);
+        // logger.info("contract event==", event)
+        try {
+            if (event.event === 'DemandCreated') {
+                await handleDemandCreated(event.returnValues);
+            }else if(event.event === 'DemandEnded') {
+                await handleDemandEnded(event.returnValues.demand);
+            }else if(event.event === 'CandidateAdded') {
+                await handleCandidateAdded(event.returnValues.protocolId);
+            }
+        }catch (error){
+            logger.error("contract events error", error)
         }
-
+    
     })
 
 async function handleCandidateAdded(protocolId){
