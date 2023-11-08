@@ -76,7 +76,9 @@ async function newCandidate(candidateData = {}) {
     const user = candidateData.user
     const gender = xss(candidateData.gender)
     const age = xss(candidateData.age)
-    const phone = xss(candidateData.phone)
+    const twitter = xss(candidateData.twitter)
+    const telegram = xss(candidateData.telegram)
+    const phone = ''
     const description = xss(candidateData.description)
     const status = CandidateStatusEnum.VALID
 
@@ -87,7 +89,9 @@ async function newCandidate(candidateData = {}) {
         gender,
         age,
         phone,
-        description
+        description,
+        twitter,
+        telegram
     }, { where: { user } });
 
     return {

@@ -38,6 +38,14 @@ const Candidate = seq.define(
             type: Sequelize.TEXT, // TEXT 可存储大文件
             allowNUll: false
         },
+        twitter: {
+            type: Sequelize.STRING,
+            allowNUll: false
+        },
+        telegram: {
+            type: Sequelize.STRING,
+            allowNUll: false
+        },
 
         /* 不用定义 createTime ，seq 会自动增加 createdAt 和 updatedAt */
     }
