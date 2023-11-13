@@ -4,6 +4,8 @@ const CCCWeb = require('../contract/build/CCCWeb.json');
 const { CCCWB_CONTRACT_CONF, CCC_CONTRACT_CONF } = require('../conf/config')
 // 在模块顶部初始化合约对象
 const web3 = new Web3(new Web3.providers.WebsocketProvider(CCCWB_CONTRACT_CONF.websocketurl));
+// const web3 = new Web3( CCCWB_CONTRACT_CONF.httpUrl);
+
 const cccWebAddress = CCCWB_CONTRACT_CONF.address;
 const contract = new web3.eth.Contract(CCCWeb.abi, cccWebAddress);
 const { updateDemandStatus, getDetail, addDemand } = require('./demand')
@@ -12,38 +14,66 @@ const { DemandStatusEnum, ProtocolStatusEnum, ProtocolMessageTypeEnum } = requir
 const proposalMessage = require('./protocol-message')
 const logger = require('../conf/log')
 
-contract.events.allEvents({
-    fromBlock: 0,
-    toBlock: 'latest'
-}, function (error, event) { })
-    .on('data', async function (event) {
-        // logger.info("contract event==", event)
-        try {
-            if (event.event === 'DemandCreated') {
-                await handleDemandCreated(event.returnValues);
-            }else if(event.event === 'DemandEnded') {
-                await handleDemandEnded(event.returnValues.demand);
-            }else if(event.event === 'CandidateAdded') {
-                await handleCandidateAdded(event.returnValues.protocolId);
-            }
-        }catch (error){
-            logger.error("contract events error", error)
-        }
+function startContractEventListening() {
+    contract.events.allEvents({
+        fromBlock: 0,
+        toBlock: 'latest'
+    }, function (error, event) { })
+        .on('data', async function (event) {
+            console.info("contract event==", event)
+            await handleEvent(event);
     
-    })
+        })
+}
 
-async function handleCandidateAdded(protocolId){
+// 在服务启动时调用
+startContractEventListening();
+    
+
+// 使用 web3.eth.subscribe 持续监听事件
+// const subscription = web3.eth.subscribe('logs', {
+//     address: cccWebAddress,
+// }, async function (error, result) {
+//     if (error) {
+//         logger.error("contract events error", error);
+//     } else {
+//         try {
+//             const event = contract.events.allEvents().decoder.decodeData(result.data, result.topics);
+//             console.info("contract events====", event);
+//             await handleEvent(event);
+//         } catch (error) {
+//             logger.error("Error handling event:", error);
+//         }
+//     }
+// });
+
+// 处理事件的函数
+async function handleEvent(event) {
+    try {
+        if (event.event === 'DemandCreated') {
+            await handleDemandCreated(event.returnValues);
+        } else if (event.event === 'DemandEnded') {
+            await handleDemandEnded(event.returnValues.demand);
+        } else if (event.event === 'CandidateAdded') {
+            await handleCandidateAdded(event.returnValues.protocolId);
+        }
+    } catch (error) {
+        logger.error("contract events error", error);
+    }
+}
+
+async function handleCandidateAdded(protocolId) {
     const protocolData = await protocol.getDetail(protocolId);
-    if(protocolData && protocolData.status === ProtocolStatusEnum.PROPOSAL_PENDING){
+    if (protocolData && protocolData.status === ProtocolStatusEnum.PROPOSAL_PENDING) {
         await protocol.updateProtocolActive(protocolId);
         await updateDemandStatus(protocolData.contract, DemandStatusEnum.ONGOING);
         await proposalMessage.newProtocolMessage(protocolData.employer, protocolId, ProtocolMessageTypeEnum.PROPOSAL_ACCETP, '')
     }
 }
 
-async function handleDemandEnded(contract){
+async function handleDemandEnded(contract) {
     const demand = await getDetail(contract);
-    if(demand && DemandStatusEnum.COMPLETED !== demand.status){
+    if (demand && DemandStatusEnum.COMPLETED !== demand.status) {
         await updateDemandStatus(contract, DemandStatusEnum.COMPLETED);
     }
 }

@@ -13,6 +13,7 @@ if (env === 'dev') {
         address: '0x5F19a5Bd51517329a99a3BaC59cBe8acEdd7113d',
         // rpcurl: 'http://127.0.0.1:8545',
         websocketurl: 'wss://goerli.infura.io/ws/v3/d445a41d8182464696de9e9c91db3776',
+        httpUrl:'https://goerli.infura.io/v3/d445a41d8182464696de9e9c91db3776',
         gas: 3000000
     }
     // ccc token
@@ -27,6 +28,7 @@ if (env === 'production') {
         address: '0x5F19a5Bd51517329a99a3BaC59cBe8acEdd7113d',
         // rpcurl: 'http://127.0.0.1:8545',
         websocketurl: 'wss://goerli.infura.io/ws/v3/d445a41d8182464696de9e9c91db3776',
+        httpUrl:'https://goerli.infura.io/v3/d445a41d8182464696de9e9c91db3776',
         gas: 3000000
     }
     // ccc token

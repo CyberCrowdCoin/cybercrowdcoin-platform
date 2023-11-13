@@ -131,8 +131,8 @@ async function addDemand(demandData = {}) {
 
 async function endDemandCheck(contract = '', creator = ''){
     const demandData = await getDetail(contract)
-    if (demandData == null || creator != demandData.creator || DemandStatusEnum.ONGOING != demandData.status) {
-        return new ErrorModel('demand data is null or status is not ongoing');
+    if (demandData == null || creator != demandData.creator || DemandStatusEnum.COMPLETED == demandData.status) {
+        return new ErrorModel('demand data is null or status is not right');
     }
     // check demand下 无进行中的protocol
     const protocolList = await getProtocolList(contract, null)
