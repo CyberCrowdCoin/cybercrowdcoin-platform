@@ -18,7 +18,6 @@ router.get('/all-list', async function (ctx, next) {
     const category = ctx.query.category || ''
     const page =  parseInt(ctx.query.page || 1)
     const pageSize = parseInt(ctx.query.pageSize || 10)
-    console.info("pageSize=", pageSize)
     const listData = await getPageList('', title, status, category, page, pageSize)
     ctx.body = new SuccessModel(listData)
 })

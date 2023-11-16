@@ -1,7 +1,7 @@
 const seq = require('./seq')
 
 // 需要同步的模型
-require('./model/WhitelistUser')
+require('./model/Config')
 
 seq.authenticate().then(() => {
     console.log('sequelize connect success.')

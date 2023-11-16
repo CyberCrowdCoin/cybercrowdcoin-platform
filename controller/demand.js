@@ -37,16 +37,14 @@ async function getPageList(creator = '', title = '', status = '', category = '',
         [Sequelize.Op.like]: `%${title}%` // 模糊查询
     }
 
-    console.info("pageSize=", pageSize)
     // 计算偏移量
     const offset = (page - 1) * pageSize;
-
     // 执行分页查询
     const result = await Demand.findAndCountAll({
         where: whereOpt,
         order: [['id', 'desc']], // 排序
         offset: offset, // 偏移量
-        limit: pageSize // 每页数量
+        limit: Number(pageSize) // 每页数量
     });
 
     const list = result.rows.map(item => item.dataValues);
@@ -111,21 +109,25 @@ async function addDemand(demandData = {}) {
     const phone = ''
     const contract = demandData.contract
     // 创建MySQL记录
-    Demand.create({
-        contract,
-        title,
-        creator,
-        category,
-        description,
-        status,
-        phone,
-        requiredSkill,
-        tokenAmount,
-        tokenAddress,
-        budget,
-        twitter,
-        telegram
-    })
+    try{
+        Demand.create({
+            contract,
+            title,
+            creator,
+            category,
+            description,
+            status,
+            phone,
+            requiredSkill,
+            tokenAmount,
+            tokenAddress,
+            budget,
+            twitter,
+            telegram
+        })
+    }catch (error){
+        console.error("Demand.create==", error)
+    }
 
 }
 

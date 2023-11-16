@@ -15,6 +15,10 @@ const CandidateStatusEnum = {
     UNVALID : 'unvalid'
 }
 
+const ConfigKeyEnum = {
+    BLOCK_NUMBER : 'blockNumber'
+}
+
 const ProtocolStatusEnum = {
     // proposal pending" "active" "invite pending" "finished" "cancelled"
     PROPOSAL_PENDING : 'proposal pending',
@@ -31,11 +35,11 @@ const ProtocolMessageTypeEnum = {
     INVITATION_SEND : 'invitation send',
     PROPOSAL_SEND : 'proposal send',
     INVITATION_ACCEPT : 'invitation accept',
-    PROPOSAL_ACCETP : 'proposal accetp',
+    PROPOSAL_ACCETP : 'proposal accept',
     INVITATION_REFUSED : 'invitation refuse',
     PROPOSAL_REFUSED : 'proposal refuse',
     INVITATION_CANCEL : 'invitation cancel',
     PROTOCOL_FINISH : 'protocol finish'
 }
 
-module.exports = { CandidateStatusEnum, DemandStatusEnum, ProtocolStatusEnum, ProtocolMessageTypeEnum}
+module.exports = { CandidateStatusEnum, DemandStatusEnum, ProtocolStatusEnum, ProtocolMessageTypeEnum, ConfigKeyEnum}

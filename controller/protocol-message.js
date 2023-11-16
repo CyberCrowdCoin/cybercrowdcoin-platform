@@ -16,7 +16,7 @@ async function getListByProtocolId(protocolId, page = 1, pageSize = 10) {
         where: whereOpt,
         order: [['id', 'desc']], // 排序
         offset: offset, // 偏移量
-        limit: pageSize // 每页数量
+        limit: Number(pageSize) // 每页数量
     });
 
     const list = result.rows.map(item => item.dataValues);

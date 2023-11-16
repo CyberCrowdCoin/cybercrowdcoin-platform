@@ -6,6 +6,7 @@ const env = process.env.NODE_ENV
 const conf = {
     host: MYSQL_CONF.host,
     dialect: 'mysql',
+    timezone: '+08:00',
 }
 
 // 生产环境下，使用连接池
@@ -23,5 +24,4 @@ const seq = new Sequelize(
     MYSQL_CONF.password, // 密码
     conf
 )
-
 module.exports = seq

@@ -32,7 +32,7 @@ async function getPageList(page = 1, pageSize = 10) {
         where: whereOpt,
         order: [['id', 'desc']],
         offset: offset,
-        limit: pageSize
+        limit: Number(pageSize)
     });
     let list = [];
     let totalItems = 0
