@@ -2,7 +2,6 @@ const Sequelize = require('sequelize')
 const xss = require('xss')
 const Candidate = require('../db/mysql/model/Candidate')
 const CandidateSkill = require('../db/mysql/model/CandidateSkill')
-const { addToIpfs } = require('../db/ipfs/ipfs')
 const { CandidateStatusEnum } = require('../model/enum')
 
 
