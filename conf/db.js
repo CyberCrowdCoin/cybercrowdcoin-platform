@@ -27,7 +27,7 @@ if (env === 'production') {
     MYSQL_CONF = {
         host: 'localhost',
         user: 'root',
-        password: 'root',
+        password: 'shaomo8090*',
         port: '3306',
         database: 'ccc_db'
     }

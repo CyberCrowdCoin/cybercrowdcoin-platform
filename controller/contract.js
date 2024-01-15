@@ -22,20 +22,20 @@ const interval = 30000; // 30 秒钟检查一次，你可以根据需求调整�
 function startTimer() {
     // 使用 setTimeout 开始一个周期
     setTimeout(async () => {
-      try {
+        try {
 
-        await listenEvents();
-        // 递归调用 startTimer，开启下一个周期
-        startTimer();
-      } catch (error) {
-        console.error('Error:', error);
-        // 处理错误后同样递归调用 startTimer，确保下一个周期会继续执行
-        startTimer();
-      }
+            await listenEvents();
+            // 递归调用 startTimer，开启下一个周期
+            startTimer();
+        } catch (error) {
+            console.error('Error:', error);
+            // 处理错误后同样递归调用 startTimer，确保下一个周期会继续执行
+            startTimer();
+        }
     }, interval);
-  }
-  // 启动定时器
-  startTimer();
+}
+// 启动定时器
+startTimer();
 
 async function listenEvents() {
     try {
@@ -43,17 +43,15 @@ async function listenEvents() {
         let latestBlockNumber = await web3.eth.getBlockNumber();
         // 获取上次检查的区块号（你可以将上次检查的区块号保存在数据库或文件中）
         let lastCheckedBlockNumber = await getLastCheckedBlockNumber(); // 请自行实现这个函数
-        
+
         // 从上次检查的区块号开始，检查到当前最新区块之间的事件
         for (let blockNumber = Number(lastCheckedBlockNumber) + 1; blockNumber <= Number(latestBlockNumber); blockNumber++) {
-            console.info("blockNumber========", blockNumber)
             const events = await contract.getPastEvents('allEvents', {
                 fromBlock: blockNumber,
                 toBlock: blockNumber,
             });
             // 处理事件
             for (const event of events) {
-                console.info('New Event:', event.event);
                 // 处理合约事件逻辑
                 await handleEvent(event)
             }
